@@ -17,7 +17,7 @@ def grp(pat, txt):
 env = Game()
 
 # create an untrained neural network objects from the config file
-player1_NN = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
+player1_NN = CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
 player2_NN = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) +  env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
 
 path1 = './run/models/'
@@ -41,11 +41,13 @@ for player_idx, _ in enumerate(version_list_CNN):
     m_tmp = player1_NN.read(path1, player_idx + 1)
     player1_NN.model.set_weights(m_tmp.get_weights())
     player1 = Agent('player1', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, player1_NN)
-    for opponent_idx, _ in enumerate(version_list_CNN):
-        if player_idx <= opponent_idx:
+    for opponent_idx, _ in enumerate(version_list_Res):
+        if opponent_idx < 8:
+            continue
+        if player_idx != opponent_idx:
             continue
         else:
-            m_tmp = player2_NN.read(path2, opponent_idx + 1)
+            m_tmp = player2_NN.read(path3, opponent_idx + 1)
             player2_NN.model.set_weights(m_tmp.get_weights())
             player2 = Agent('player2', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, player2_NN)
 
@@ -69,7 +71,7 @@ for player_idx, _ in enumerate(version_list_CNN):
             plt.grid()
             plt.xlabel('Versions')
             plt.ylabel('Points')
-            plt.title('Compétitions intra-architecture CNN')
-            plt.savefig(path2 + 'CNN_{}.png'.format(j))
+            plt.title('Compétitions inter-architecture')
+            plt.savefig(path2 + 'inter_{}.png'.format(j))
             j+=1
 
