@@ -36,7 +36,7 @@ class Gen_Model():
 		self.model.save(run_folder + 'models/version' + "{0:0>4}".format(version) + '.h5')
 
 	def read(self,run_folder, version):
-		return load_model(run_folder + "/models/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
+		return load_model(run_folder + "/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
 
 	def printWeightAverages(self):
 		layers = self.model.layers
