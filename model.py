@@ -35,8 +35,8 @@ class Gen_Model():
 	def write(self, game, version):
 		self.model.save(run_folder + 'models/version' + "{0:0>4}".format(version) + '.h5')
 
-	def read(self, game, run_number, version):
-		return load_model( run_archive_folder + game + '/run' + str(run_number).zfill(4) + "/models/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
+	def read(self,run_folder, version):
+		return load_model(run_folder + "/models/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
 
 	def printWeightAverages(self):
 		layers = self.model.layers
@@ -226,7 +226,7 @@ class Residual_CNN(Gen_Model):
 
 		if len(self.hidden_layers) > 1:
 			for h in self.hidden_layers[1:]:
-				x = self.residual_layer(x, h['filters'], h['kernel_size'])
+				x = self.conv_layer(x, h['filters'], h['kernel_size'])
 
 		vh = self.value_head(x)
 		ph = self.policy_head(x)
