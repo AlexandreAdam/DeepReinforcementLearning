@@ -17,35 +17,35 @@ def grp(pat, txt):
 env = Game()
 
 # create an untrained neural network objects from the config file
-player1_NN = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
-player2_NN = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) +  env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
+player1_NN = CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
+player2_NN = CNN(config.REG_CONST, config.LEARNING_RATE, (2,) +  env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
 
 path1 = './run/models/'
 path3 =  './ResNet_Run/'
-path2 = './results/figures/inter_architecture/'
+path2 = './results/figures/intra_architecture_CNN_2/'
 EPISODES = 5
+
 version_list_CNN = os.listdir(path1)
 version_list_CNN.sort(key=lambda l: grp('(0-9+)', l))
 
 version_list_Res = os.listdir(path3)
 version_list_Res.sort(key=lambda l: grp('(0-9+)', l))
-
-keys = [i for i in range(len(version_list_CNN))]
-values = [0]*len(version_list_CNN)
+keys = [i for i in range(len(version_list_CNN)) if i % 4 == 0]
+values = [0]*11
 points_dict = dict(zip(keys, values))
 
 j=0
 
 # Each versions will play 5 games against each other versions.
 for player_idx, _ in enumerate(version_list_CNN):
-    m_tmp = player1_NN.read(path1, player_idx + 1)
-    player1_NN.model.set_weights(m_tmp.get_weights())
-    player1 = Agent('player1', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, player1_NN)
     for opponent_idx, _ in enumerate(version_list_CNN):
-        if player_idx <= opponent_idx:
+        if player_idx <= opponent_idx or player_idx % 4 !=0 or opponent_idx %4 != 0:
             continue
         else:
-            m_tmp = player2_NN.read(path2, opponent_idx + 1)
+            m_tmp = player1_NN.read(path1, player_idx + 1)
+            player1_NN.model.set_weights(m_tmp.get_weights())
+            player1 = Agent('player1', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, player1_NN)
+            m_tmp = player2_NN.read(path1, opponent_idx + 1)
             player2_NN.model.set_weights(m_tmp.get_weights())
             player2 = Agent('player2', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, player2_NN)
 
