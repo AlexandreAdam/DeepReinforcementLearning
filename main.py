@@ -32,7 +32,7 @@ env = Game()
 
 # If loading an existing neural network, copy the config file to root
 if initialise.INITIAL_RUN_NUMBER != None:
-    copyfile(run_archive_folder  + env.name + '/run' + str(initialise.INITIAL_RUN_NUMBER).zfill(4) + '/config.py', './config.py')
+    copyfile(run_archive_folder + 'Model_{}'.format(initialise.INITIAL_RUN_NUMBER) + '/config.py', './config.py')
 
 import config
 
@@ -42,7 +42,8 @@ if initialise.INITIAL_MEMORY_VERSION == None:
     memory = Memory(config.MEMORY_SIZE)
 else:
     print('LOADING MEMORY VERSION ' + str(initialise.INITIAL_MEMORY_VERSION) + '...')
-    memory = pickle.load( open( run_archive_folder + env.name + '/run' + str(initialise.INITIAL_RUN_NUMBER).zfill(4) + "/memory/memory" + str(initialise.INITIAL_MEMORY_VERSION).zfill(4) + ".p",   "rb" ) )
+    memory = pickle.load( open( run_archive_folder + 'Model_' + str(initialise.INITIAL_RUN_NUMBER)
+                                + "/memory/memory" + str(initialise.INITIAL_MEMORY_VERSION).zfill(4) + ".p",   "rb" ) )
 
 ######## LOAD MODEL IF NECESSARY ########
 
@@ -54,7 +55,7 @@ best_NN = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) +  env.grid_
 if initialise.INITIAL_MODEL_VERSION != None:
     best_player_version  = initialise.INITIAL_MODEL_VERSION
     print('LOADING MODEL VERSION ' + str(initialise.INITIAL_MODEL_VERSION) + '...')
-    m_tmp = best_NN.read(env.name, initialise.INITIAL_RUN_NUMBER, best_player_version)
+    m_tmp = best_NN.read(initialise.INITIAL_RUN_NUMBER, best_player_version)
     current_NN.model.set_weights(m_tmp.get_weights())
     best_NN.model.set_weights(m_tmp.get_weights())
 #otherwise just ensure the weights on the two players are the same
@@ -64,9 +65,10 @@ else:
 
 #copy the config file to the run folder
 copyfile('./config.py', run_folder + 'config.py')
-plot_model(current_NN.model, to_file=run_folder + 'models/model.png', show_shapes = True)
+
 
 print('\n')
+print(current_NN.model.summary())
 
 ######## CREATE THE PLAYERS ########
 
@@ -80,9 +82,9 @@ while 1:
     iteration += 1
     reload(lg)
     reload(config)
-    
+
     print('ITERATION NUMBER ' + str(iteration))
-    
+
     lg.logger_main.info('BEST PLAYER VERSION: %d', best_player_version)
     print('BEST PLAYER VERSION ' + str(best_player_version))
 
@@ -90,9 +92,9 @@ while 1:
     print('SELF PLAYING ' + str(config.EPISODES) + ' EPISODES...')
     _, memory, _, _ = playMatches(best_player, best_player, config.EPISODES, lg.logger_main, turns_until_tau0 = config.TURNS_UNTIL_TAU0, memory = memory)
     print('\n')
-    
+
     memory.clear_stmemory()
-    
+
     if len(memory.ltmemory) >= config.MEMORY_SIZE:
 
         ######## RETRAINING ########
@@ -101,14 +103,15 @@ while 1:
         print('')
 
         if iteration % 5 == 0:
-            pickle.dump( memory, open( run_folder + "memory/memory" + str(iteration).zfill(4) + ".p", "wb" ) )
+            pickle.dump( memory, open( run_folder + 'Model_' + str(initialise.INITIAL_RUN_NUMBER) +
+                                       "/memory/memory" + str(iteration).zfill(4) + ".p", "wb" ) )
 
         lg.logger_memory.info('====================')
         lg.logger_memory.info('NEW MEMORIES')
         lg.logger_memory.info('====================')
-        
+
         memory_samp = random.sample(memory.ltmemory, min(1000, len(memory.ltmemory)))
-        
+
         for s in memory_samp:
             current_value, current_probs, _ = current_player.get_preds(s['state'])
             best_value, best_probs, _ = best_player.get_preds(s['state'])
@@ -123,7 +126,7 @@ while 1:
             lg.logger_memory.info('INPUT TO MODEL: %s', current_player.model.convertToModelInput(s['state']))
 
             s['state'].render(lg.logger_memory)
-            
+
         ######## TOURNAMENT ########
         print('TOURNAMENT...')
         scores, _, points, sp_scores = playMatches(best_player, current_player, config.EVAL_EPISODES, lg.logger_tourney, turns_until_tau0 = 0, memory = None)
@@ -138,7 +141,7 @@ while 1:
         if scores['current_player'] > scores['best_player'] * config.SCORING_THRESHOLD:
             best_player_version = best_player_version + 1
             best_NN.model.set_weights(current_NN.model.get_weights())
-            best_NN.write(env.name, best_player_version)
+            best_NN.write(initialise.INITIAL_RUN_NUMBER, best_player_version)
 
     else:
         print('MEMORY SIZE: ' + str(len(memory.ltmemory)))

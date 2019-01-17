@@ -1,2 +1,2 @@
-run_folder = './results/'
-run_archive_folder = './run/'
+run_folder = './Models/'
+run_archive_folder = './Models/'

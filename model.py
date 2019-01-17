@@ -32,11 +32,11 @@ class Gen_Model():
 	def fit(self, states, targets, epochs, verbose, validation_split, batch_size):
 		return self.model.fit(states, targets, epochs=epochs, verbose=verbose, validation_split = validation_split, batch_size = batch_size)
 
-	def write(self, game, version):
-		self.model.save(run_folder + 'models/version' + "{0:0>4}".format(version) + '.h5')
+	def write(self, model, version):
+		self.model.save(run_folder + 'Model_' + str(model) + '/Versions/version' + "{0:0>4}".format(version) + '.h5')
 
-	def read(self,run_folder, version):
-		return load_model(run_folder + "version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
+	def read(self, model, version):
+		return load_model(run_folder + 'Model_' + str(model) + "/Versions/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
 
 	def printWeightAverages(self):
 		layers = self.model.layers
