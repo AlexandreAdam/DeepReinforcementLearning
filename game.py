@@ -203,7 +203,6 @@ class GameState():
 
 
 
-
 	def takeAction(self, action):
 		newBoard = np.array(self.board)
 		newBoard[action]=self.playerTurn
