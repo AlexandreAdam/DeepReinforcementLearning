@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/DeepReinforcementLearning.iml" filepath="$PROJECT_DIR$/.idea/DeepReinforcementLearning.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../PycharmProjects/Perfect4/.idea/Perfect4.iml" filepath="$PROJECT_DIR$/../PycharmProjects/Perfect4/.idea/Perfect4.iml" />
     </modules>
   </component>
 </project>

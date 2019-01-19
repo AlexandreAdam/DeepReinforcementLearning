@@ -8,11 +8,11 @@ import initialise
 
 path = run_folder + 'Model_' + str(initialise.INITIAL_RUN_NUMBER) + '/'
 LOGGER_DISABLED = {
-'main': False
-, 'memory': False
-, 'tourney': False
-, 'mcts': False
-, 'model': False}
+'main': True
+, 'memory': True
+, 'tourney': True
+, 'mcts': True
+, 'model': True}
 
 
 logger_mcts = setup_logger('logger_mcts', path + 'logs/logger_mcts.log')

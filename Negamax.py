@@ -275,13 +275,22 @@ class Board:
         tmp = str(self.board)
         return hash(tmp)
 
+#Negamax player
+class NegaPlayer:
+    def __init__(self, sign, depth):
+        self.sign = sign
+        self.depth = depth
 
+    def get_move(self, board, opponent):
+        n = Negamax(board, self.depth)
+        move = n.calculate_move(board, self.sign, opponent.sign)
+        return move
 
 #Create empty board
-board = Board()
+#board = Board()
 
 #Create solver object
-nega = Negamax(board)
+#nega = Negamax(board)
 
 #Ask solver for next move.
-print(nega.calculate_move(board, "+", "+"))
+#print(nega.calculate_move(board, "+", "+"))
