@@ -5,6 +5,7 @@ import config
 import initialise
 from model import Residual_CNN
 from agent import Agent
+import numpy as np
 
 class ZvNMatch:
 
@@ -32,9 +33,12 @@ class ZvNMatch:
         self.zeroPlayer.model.set_weights(m_tmp.get_weights())
         self.zeroPlayer = Agent('player1', self.zeroEnv.state_size, self.zeroEnv.action_size, config.MCTS_SIMS, config.CPUCT, self.zeroPlayer)
 
+
+        self.results = 0
+
         #Playing matches
         for x in range(nbMatches):
-            results = self.playMatch()
+            self.results += self.playMatch()
             self.resetEnvs()
 
     def resetEnvs(self):
@@ -45,28 +49,49 @@ class ZvNMatch:
     def playMatch(self):
 
         matchEnded = False
-        #while not matchEnded:
-        for x in range(3):
+        while not matchEnded:
+        #for x in range(10):
+
+            #Player 1 (+) chooses
+            (action, pi, value, NN_value) = self.zeroPlayer.act(self.zeroEnv.gameState, 0)
+            print("Zero (1/+) plays cell number: ", action)
+
+            #Player 1 acts on both grids
+            self.zeroEnv.step(action)
+            self.negaEnv.board[action // self.negaEnv.width][action%self.negaEnv.width] = '+'
+
+            #Check if Zero player wins
+            if self.zeroEnv.gameState._checkForEndGame():
+                if np.count_nonzero(self.zeroEnv.gameState.board) == 42:
+                    return 0
+                else:
+                    return 1
+
+            #Player 2 (-) chooses
+            self.negaPlayer = Negamax(self.negaEnv, self.negaMaxDepth)
+            move = self.negaPlayer.calculate_move(self.negaEnv, "-", "+")
+
+            #Player 2 acts on both grids
+            self.negaEnv.try_place_piece(move, "-")
+
+            #Must convert row to action
+            print("Nega (-1, -) plays column: ", move)
+            for y in range(6, 0, -1):
+                if self.zeroEnv.gameState.board[7*(y-1)+move-1] == 0:
+                    self.zeroEnv.step(7*(y-1)+move-1)
+                    break
+
+            #Check if Negamaz player wins
+            if self.zeroEnv.gameState._checkForEndGame():
+                if np.count_nonzero(self.zeroEnv.gameState.board) == 42:
+                    return 0
+                else:
+                    return -1
 
             #Is the action the cell number or the index or that cell in the list of cells in zeroEnv?
             print(self.zeroEnv.gameState.board)
-            print(self.negaEnv.board)
-            #Player 1 (+) acts
-            (action, pi, value, NN_value) = self.zeroPlayer.act(self.zeroEnv.gameState, config.TURNS_UNTIL_TAU0 ) #is this the correct tau parameter?
-            print("Zero (1/+) plays cell number: ", action) # BUG : ALWAYS CHOOSES 38 (DOES NOT SEE MAP UPDATES FROM PREVIOUS ITER?)
-            self.zeroEnv.gameState.board[action] = 1
-            self.negaEnv.board[action // self.negaEnv.width][action%self.negaEnv.width] = '+'
+            for x in self.negaEnv.board:
+                print(x)
 
-            #Player 2 (-) acts
-            self.negaPlayer = Negamax(self.negaEnv, self.negaMaxDepth)
-            move = self.negaPlayer.calculate_move(self.negaEnv, "-", "+")
-            print("Nega (-1, -) plays column: ", move)
-
-            self.negaEnv.try_place_piece(move, "-")
-
-            for y in range(6,0, -1):
-                if self.zeroEnv.gameState.board[7*(y-1)+move-1] == 0:
-                    self.zeroEnv.gameState.board[7*(y-1)+move-1] = -1
-                    break
-
-matches = ZvNMatch( "Models/Model_1/Versions/version0037.h5",1)
+matches = ZvNMatch( "Models/Model_1/Versions/version0037.h5", 1,6)
+print(matches.results)
