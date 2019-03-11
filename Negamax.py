@@ -274,12 +274,3 @@ class Board:
     def __hash__(self):
         tmp = str(self.board)
         return hash(tmp)
-
-#Create empty board
-#board = Board()
-
-#Create solver object
-#nega = Negamax(board)
-
-#Ask solver for next move.
-#print(nega.calculate_move(board, "+", "+"))
