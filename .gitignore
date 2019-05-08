@@ -107,3 +107,7 @@ ipynb/
 code_archive/
 games/archive/
 *.pyc
+
+.idea/
+*.xml
+*.log
