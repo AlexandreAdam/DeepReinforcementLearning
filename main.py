@@ -63,9 +63,6 @@ else:
     best_player_version = 0
     best_NN.model.set_weights(current_NN.model.get_weights())
 
-#copy the config file to the run folder
-copyfile('./config.py', run_folder + 'config.py')
-
 
 print('\n')
 print(current_NN.model.summary())

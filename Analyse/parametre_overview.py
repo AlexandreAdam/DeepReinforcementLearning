@@ -3,7 +3,9 @@ import os
 import numpy as np
 import imp
 
-models_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Models')
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+models_path = os.path.join(BASE_DIR, 'Models')
 
 models = os.listdir(models_path)
 
@@ -20,7 +22,7 @@ for model in models:
     model_path = os.path.join(models_path, model)
     config = imp.load_source(model, os.path.join(model_path, 'config.py'))
 
-    table.loc['Épisode',                     model] = config.EPISODES
+    table.loc['Épisodes',                    model] = config.EPISODES
     table.loc['MCTS simulations',            model] = config.MCTS_SIMS
     table.loc['Memory size',                 model] = config.MEMORY_SIZE
     table.loc['Turns until tau0',            model] = config.TURNS_UNTIL_TAU0
@@ -37,3 +39,4 @@ for model in models:
     table.loc['Scoring thresholds',          model] = config.SCORING_THRESHOLD
 
 print(table)
+table.to_csv('parametres.csv')
