@@ -1,20 +1,16 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""This heuristic algorithm is based on negamax, which is a variant of a minimax
+algorithm. Negamax can be used due to zero-sum property of Connect-4. Heuristic
+algorithm is needed, because Connect Four has around 4*10^12 (4 trillion)
+different possible games.
+"""
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+# Standard
 try:
     from termcolor import colored
     colored_imported = True
 except ImportError:
     colored_imported = False
 
-"""This heuristic algorithm is based on negamax, which is a variant of a minimax
-algorithm.Negamax can be used due to zero-sum property of Connect-4. Heuristic
-algorithm is needed, because Connect Four has around 4*10^12 (4 trillion)
-different possible games.
-"""
 
 class Negamax:
 
@@ -38,8 +34,8 @@ class Negamax:
     '''
     def __negamax(self, board, curr_sign, opponent_sign, depth=0):
 
-        #The Negamax algorithm operates on a Board type object. If the board passed as parameter is in list ,
-        #it must first be converted.
+        # The Negamax algorithm operates on a Board type object. If the board passed as parameter is in list ,
+        # it must first be converted.
         if isinstance(board, list):
             board = self.convertListToMatrix(board)
 
@@ -48,7 +44,7 @@ class Negamax:
         if hashed_board in self.__evaluated:
             return None, self.__evaluated[hashed_board]
 
-        #Reached maximum allowed depth.
+        # Reached maximum allowed depth.
         if depth == self.__max_depth:
             score = self.__evaluate(board.board, curr_sign, opponent_sign)
             self.__evaluated[hashed_board] = score
@@ -122,7 +118,7 @@ class Negamax:
 
     def calculate_move(self, board, curr_sign, opponent_sign):
         move, score = self.__negamax(board, curr_sign, opponent_sign)
-        #print(score)
+        # print(score)
         return move
 
     '''
@@ -134,7 +130,7 @@ class Negamax:
         newBoard = [[' ' for x in range(width)] for y in range(height)]
 
 
-        if(len(board) == width*height):
+        if len(board) == width*height:
             counter = 0
             for x in range(width):
                 for y in range(height):
@@ -147,8 +143,7 @@ class Negamax:
             return [[' ' for x in range(width)] for y in range(height)]
 
         else:
-            raise ValueError("Length of list cannot be converted to matrix specified width and height (7 and 6 by default).")
-
+            raise ValueError("Length of list cannot be converted to matrix specified width and height (7x6 by default).")
 
 # TODO:
 #    - Prefer games that win faster or lose later
@@ -165,7 +160,7 @@ class Board:
         self.segment_indexes = self.__segment_indexes()
         self.__segment_indexes_by_index = self.__segment_indexes_by_index()
 
-    #Calls must be made as Board[y][x]
+    # Calls must be made as Board[y][x]
     def __build_board(self, width, height):
         return [[' ' for x in range(width)] for y in range(height)]
 
@@ -184,7 +179,7 @@ class Board:
         try:
             value = self.undo_stack.pop()
         except IndexError:
-            #print('Nothing to undo')
+            # print('Nothing to undo')
             return False
         for row in self.board:
             if not row[value] == ' ':

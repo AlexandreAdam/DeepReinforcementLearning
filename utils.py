@@ -1,5 +1,10 @@
+"""
+Used to define loggers.
+"""
 
+# Standard
 import logging
+
 
 def setup_logger(name, log_file, level=logging.INFO):
 

@@ -1,22 +1,26 @@
-# %matplotlib inline
+"""
+Used to define players and allowed actions.
+"""
 
-import numpy as np
+# Standard
 import random
+import time
+from IPython import display
 
+# Third-party
+import numpy as np
+import pylab as pl
+import matplotlib.pyplot as plt
+
+# Local
 import MCTS as mc
 from game import GameState
 from loss import softmax_cross_entropy_with_logits
-
 import config
 import loggers as lg
-import time
-
-import matplotlib.pyplot as plt
-from IPython import display
-import pylab as pl
 
 
-class User():
+class User:
 	def __init__(self, name, state_size, action_size):
 		self.name = name
 		self.state_size = state_size
@@ -28,11 +32,10 @@ class User():
 		pi[action] = 1
 		value = None
 		NN_value = None
-		return (action, pi, value, NN_value)
+		return action, pi, value, NN_value
 
 
-
-class Agent():
+class Agent:
 	def __init__(self, name, state_size, action_size, mcts_simulations, cpuct, model):
 		self.name = name
 
@@ -52,7 +55,6 @@ class Agent():
 		self.val_overall_loss = []
 		self.val_value_loss = []
 		self.val_policy_loss = []
-
 	
 	def simulate(self):
 
@@ -60,35 +62,34 @@ class Agent():
 		self.mcts.root.state.render(lg.logger_mcts)
 		lg.logger_mcts.info('CURRENT PLAYER...%d', self.mcts.root.state.playerTurn)
 
-		##### MOVE THE LEAF NODE
+		# MOVE THE LEAF NODE
 		leaf, value, done, breadcrumbs = self.mcts.moveToLeaf()
 		leaf.state.render(lg.logger_mcts)
 
-		##### EVALUATE THE LEAF NODE
+		# EVALUATE THE LEAF NODE
 		value, breadcrumbs = self.evaluateLeaf(leaf, value, done, breadcrumbs)
 
-		##### BACKFILL THE VALUE THROUGH THE TREE
+		# BACKFILL THE VALUE THROUGH THE TREE
 		self.mcts.backFill(leaf, value, breadcrumbs)
-
 
 	def act(self, state, tau):
 
-		if self.mcts == None or state.id not in self.mcts.tree:
+		if self.mcts is None or state.id not in self.mcts.tree:
 			self.buildMCTS(state)
 		else:
 			self.changeRootMCTS(state)
 
-		#### run the simulation
+		# Run the simulation
 		for sim in range(self.MCTSsimulations):
 			lg.logger_mcts.info('***************************')
 			lg.logger_mcts.info('****** SIMULATION %d ******', sim + 1)
 			lg.logger_mcts.info('***************************')
 			self.simulate()
 
-		#### get action values
+		#  Get action values
 		pi, values = self.getAV(1)
 
-		####pick the action
+		# Pick the action
 		action, value = self.chooseAction(pi, values, tau)
 
 		nextState, _, _ = state.takeAction(action)
@@ -100,11 +101,11 @@ class Agent():
 		lg.logger_mcts.info('MCTS PERCEIVED VALUE...%f', value)
 		lg.logger_mcts.info('NN PERCEIVED VALUE...%f', NN_value)
 
-		return (action, pi, value, NN_value)
-
+		return action, pi, value, NN_value
 
 	def get_preds(self, state):
-		#predict the leaf
+
+		# Predict the leaf
 		inputToModel = np.array([self.model.convertToModelInput(state)])
 
 		preds = self.model.predict(inputToModel)
@@ -116,16 +117,15 @@ class Agent():
 
 		allowedActions = state.allowedActions
 
-		mask = np.ones(logits.shape,dtype=bool)
+		mask = np.ones(logits.shape, dtype=bool)
 		mask[allowedActions] = False
 		logits[mask] = -100
 
-		#SOFTMAX
+		# SOFTMAX
 		odds = np.exp(logits)
 		probs = odds / np.sum(odds) ###put this just before the for?
 
-		return ((value, probs, allowedActions))
-
+		return value, probs, allowedActions
 
 	def evaluateLeaf(self, leaf, value, done, breadcrumbs):
 
@@ -154,9 +154,7 @@ class Agent():
 		else:
 			lg.logger_mcts.info('GAME VALUE FOR %d: %f', leaf.playerTurn, value)
 
-		return ((value, breadcrumbs))
-
-
+		return value, breadcrumbs
 		
 	def getAV(self, tau):
 		edges = self.mcts.root.edges
@@ -176,7 +174,7 @@ class Agent():
 			action = random.choice(actions)[0]
 		else:
 			action_idx = np.random.multinomial(1, pi)
-			action = np.where(action_idx==1)[0][0]
+			action = np.where(action_idx == 1)[0][0]
 
 		value = values[action]
 
@@ -184,7 +182,6 @@ class Agent():
 
 	def replay(self, ltmemory):
 		lg.logger_mcts.info('******RETRAINING MODEL******')
-
 
 		for i in range(config.TRAINING_LOOPS):
 			minibatch = random.sample(ltmemory, min(config.BATCH_SIZE, len(ltmemory)))

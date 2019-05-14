@@ -1,4 +1,11 @@
+"""
+Used to store training memory.
+"""
+
+# Standard
 from collections import deque
+
+# Local
 import config
 
 
@@ -10,12 +17,11 @@ class Memory:
 
 	def commit_stmemory(self, identities, state, actionValues):
 		for r in identities(state, actionValues):
-			self.stmemory.append({
-				'board': r[0].board
-				, 'state': r[0]
-				, 'id': r[0].id
-				, 'AV': r[1]
-				, 'playerTurn': r[0].playerTurn
+			self.stmemory.append({'board': r[0].board,
+				'state': r[0],
+				'id': r[0].id,
+				'AV': r[1],
+				'playerTurn': r[0].playerTurn
 				})
 
 	def commit_ltmemory(self):
@@ -25,4 +31,3 @@ class Memory:
 
 	def clear_stmemory(self):
 		self.stmemory = deque(maxlen=config.MEMORY_SIZE)
-		
