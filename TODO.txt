@@ -1,8 +1,9 @@
 Used to list currently assigned tasks.
 
-Both:
+Reminders (continuous):
 - Respect PEP8 standards for code readability and consistency
 - Clean up code base to remove any unnecessary directories or LOCs
+- Maintain language consistency (directories, comments, Git, etc)
 
 Eric:
 - Implement favoritism for earlier wins in negamax algorithm
