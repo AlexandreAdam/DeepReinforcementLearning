@@ -1,0 +1,16 @@
+Used to list currently assigned tasks.
+
+Both:
+- Respect PEP8 standards for code readability and consistency
+- Clean up code base to remove any unnecessary directories or LOCs
+
+Eric:
+- Implement favoritism for earlier wins in negamax algorithm
+- Implement interface for ResNet Vs Negamax competitions and result analysis
+- Optimal learning rate analysis
+-
+
+Alex:
+-
+-
+-
