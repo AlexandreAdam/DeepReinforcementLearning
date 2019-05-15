@@ -12,6 +12,6 @@ Eric:
 -
 
 Alex:
--
--
--
+- Construire les analyses de performance
+- Construire les analyses sur la vitesse d'apprentissage en fonction de la complexité
+- Optimiser les hyperparamètres
