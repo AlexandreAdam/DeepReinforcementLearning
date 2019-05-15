@@ -9,9 +9,13 @@ Eric:
 - Implement favoritism for earlier wins in negamax algorithm
 - Implement interface for ResNet Vs Negamax competitions and result analysis
 - Optimal learning rate analysis
--
 
 Alex:
 - Construire les analyses de performance
 - Construire les analyses sur la vitesse d'apprentissage en fonction de la complexité
 - Optimiser les hyperparamètres
+
+
+Unassigned:
+    -run_archive_folder is deprecated and unused but main.py still loads memory from this directory. Must refactor code
+    to load memory from Models directory instead
