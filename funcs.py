@@ -12,6 +12,7 @@ import initialise
 
 import config
 
+
 def playMatchesBetweenVersions(env, run_version, player1version, player2version, EPISODES, logger, turns_until_tau0, goes_first = 0):
     
     if player1version == -1:
@@ -39,12 +40,12 @@ def playMatchesBetweenVersions(env, run_version, player1version, player2version,
     return (scores, memory, points, sp_scores)
 
 
-def playMatches(player1, player2, EPISODES, logger, turns_until_tau0, memory = None, goes_first = 0):
+def playMatches(player1, player2, EPISODES, logger, turns_until_tau0, memory=None, goes_first=0):
 
     env = Game()
-    scores = {player1.name:0, "drawn": 0, player2.name:0}
-    sp_scores = {'sp':0, "drawn": 0, 'nsp':0}
-    points = {player1.name:[], player2.name:[]}
+    scores = {player1.name: 0, "drawn": 0, player2.name: 0}
+    sp_scores = {'sp': 0, "drawn": 0, 'nsp': 0}
+    points = {player1.name: [], player2.name: []}
 
     for e in range(EPISODES):
 
@@ -52,7 +53,7 @@ def playMatches(player1, player2, EPISODES, logger, turns_until_tau0, memory = N
         logger.info('EPISODE %d OF %d', e+1, EPISODES)
         logger.info('====================')
 
-        print (str(e+1) + ' ', end='')
+        print(str(e+1) + ' ', end='')
 
         state = env.reset()
         
@@ -62,18 +63,18 @@ def playMatches(player1, player2, EPISODES, logger, turns_until_tau0, memory = N
         player2.mcts = None
 
         if goes_first == 0:
-            player1Starts = random.randint(0,1) * 2 - 1
+            player1Starts = random.randint(0, 1) * 2 - 1
         else:
             player1Starts = goes_first
 
         if player1Starts == 1:
-            players = {1:{"agent": player1, "name":player1.name}
-                    , -1: {"agent": player2, "name":player2.name}
+            players = {1: {"agent": player1, "name": player1.name}
+                    , -1: {"agent": player2, "name": player2.name}
                     }
             logger.info(player1.name + ' plays as X')
         else:
-            players = {1:{"agent": player2, "name":player2.name}
-                    , -1: {"agent": player1, "name":player1.name}
+            players = {1: {"agent": player2, "name": player2.name}
+                    , -1: {"agent": player1, "name": player1.name}
                     }
             logger.info(player2.name + ' plays as X')
             logger.info('--------------')
@@ -83,14 +84,14 @@ def playMatches(player1, player2, EPISODES, logger, turns_until_tau0, memory = N
         while done == 0:
             turn = turn + 1
     
-            #### Run the MCTS algo and return an action
+            # Run the MCTS algo and return an action
             if turn < turns_until_tau0:
                 action, pi, MCTS_value, NN_value = players[state.playerTurn]['agent'].act(state, 1)
             else:
                 action, pi, MCTS_value, NN_value = players[state.playerTurn]['agent'].act(state, 0)
 
-            if memory != None:
-                ####Commit the move to memory
+            if memory is not None:
+                # Commit the move to memory
                 memory.commit_stmemory(env.identities, state, pi)
 
 

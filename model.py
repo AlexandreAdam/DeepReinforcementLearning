@@ -32,6 +32,7 @@ class Gen_Model:
 		return self.model.fit(states, targets, epochs=epochs, verbose=verbose, validation_split = validation_split, batch_size = batch_size)
 
 	def write(self, model, version):
+		print('Saving model in directory:' + run_folder + 'Model_' + str(model) + '/Versions/version' + "{0:0>4}".format(version) + '.h5')
 		self.model.save(run_folder + 'Model_' + str(model) + '/Versions/version' + "{0:0>4}".format(version) + '.h5')
 
 	def read(self, model, version):

@@ -71,7 +71,6 @@ print(current_NN.model.summary())
 # Create players
 current_player = Agent('current_player', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, current_NN)
 best_player = Agent('best_player', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, best_NN)
-# user_player = User('player1', env.state_size, env.action_size)
 iteration = 0
 
 # Training loop
