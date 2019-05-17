@@ -22,9 +22,7 @@ class ZvNMatch:
     negaMax variant of the heuristic min max solution to Connect4.
     '''
 
-    def __init__(self, pathToZeroModel, nbMatches, negaMaxDepth=6):
-
-        self.pathToZeroModel = pathToZeroModel
+    def __init__(self, model_number, nbMatches, negaMaxDepth=6):
 
         # Determines both probability of choosing correct move and time to complete.
         self.negaMaxDepth = negaMaxDepth
@@ -38,7 +36,7 @@ class ZvNMatch:
         self.negaPlayer = Negamax(self.negaEnv)
 
         # Setting weights and initiating agent.
-        m_tmp = self.zeroPlayer.read(initialise.INITIAL_RUN_NUMBER, 37)
+        m_tmp = self.zeroPlayer.read(initialise.INITIAL_RUN_NUMBER, model_number)
         self.zeroPlayer.model.set_weights(m_tmp.get_weights())
         self.zeroPlayer = Agent('player1', self.zeroEnv.state_size, self.zeroEnv.action_size, config.MCTS_SIMS, config.CPUCT, self.zeroPlayer)
 
@@ -62,7 +60,7 @@ class ZvNMatch:
 
             # Player 1 (+) chooses
             (action, pi, value, NN_value) = self.zeroPlayer.act(self.zeroEnv.gameState, 0)
-            print("Zero (1/+) plays cell number: ", action)
+            #print("Zero (1, +) plays cell number: ", action)
 
             # Player 1 acts on both grids
             self.zeroEnv.step(action)
@@ -83,7 +81,7 @@ class ZvNMatch:
             self.negaEnv.try_place_piece(move, "-")
 
             # Must convert row to action
-            print("Nega (-1, -) plays column: ", move)
+            #print("Nega (-1, -) plays column: ", move)
             for y in range(6, 0, -1):
                 if self.zeroEnv.gameState.board[7*(y-1)+move-1] == 0:
                     self.zeroEnv.step(7*(y-1)+move-1)
@@ -96,10 +94,12 @@ class ZvNMatch:
                 else:
                     return -1
 
-            print(self.zeroEnv.gameState.board)
-            for x in self.negaEnv.board:
-                print(x)
+            #print(self.zeroEnv.gameState.board)
+            #for x in self.negaEnv.board:
+            #    print(x)
 
 
-matches = ZvNMatch("Models/Model_1/Versions/version0037.h5", 1, 6)
-print(matches.results)
+for x in range(1, 50):
+    print('match:', x)
+    matches = ZvNMatch(str(x), 1)
+    print(matches.results)

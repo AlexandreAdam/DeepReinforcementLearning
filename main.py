@@ -73,6 +73,8 @@ current_player = Agent('current_player', env.state_size, env.action_size, config
 best_player = Agent('best_player', env.state_size, env.action_size, config.MCTS_SIMS, config.CPUCT, best_NN)
 iteration = 0
 
+print(config.MEMORY_SIZE)
+
 # Training loop
 while 1:
 

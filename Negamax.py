@@ -129,7 +129,6 @@ class Negamax:
 
         newBoard = [[' ' for x in range(width)] for y in range(height)]
 
-
         if len(board) == width*height:
             counter = 0
             for x in range(width):
@@ -138,9 +137,10 @@ class Negamax:
                         newBoard[y][x] = "X"
                     elif board[counter] is -1:
                         newBoard[y][x] = "O"
-                    counter+=1
+                    counter += 1
 
-            return [[' ' for x in range(width)] for y in range(height)]
+            return newBoard
+            #return [[' ' for x in range(width)] for y in range(height)]
 
         else:
             raise ValueError("Length of list cannot be converted to matrix specified width and height (7x6 by default).")
