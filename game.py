@@ -32,7 +32,7 @@ class Game:
         return next_state, value, done, info
 
     def identities(self, state, actionValues):
-        identities = [(state,actionValues)]
+        identities = [(state, actionValues)]
 
         currentBoard = state.board
         currentAV = actionValues
