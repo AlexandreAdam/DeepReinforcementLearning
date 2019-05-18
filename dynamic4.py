@@ -165,7 +165,7 @@ class Game:
         self.currentPlayer = 1
         self.game_shape = (6, 7)
         self.connect_size = 4
-        self.gameState = DynamicGameState(board=np.zeros(42, dtype=np.int), playerTurn=1,
+        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), playerTurn=1,
                                           shape=self.game_shape, connect_size=self.connect_size)
         self.actionSpace = np.zeros(42, dtype=np.int)
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
@@ -176,7 +176,7 @@ class Game:
         self.action_size = len(self.actionSpace)
 
     def reset(self):
-        self.gameState = DynamicGameState(board=np.zeros(42, dtype=np.int), playerTurn=1,
+        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), playerTurn=1,
                                           shape=self.game_shape, connect_size=self.connect_size)
         self.currentPlayer = 1
         return self.gameState
