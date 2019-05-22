@@ -188,7 +188,7 @@ class Game:
         info = None
         return next_state, value, done, info
 
-    # TO BE REFACTORED TO ACCEPT ANY SHAPE STATE AND ACTIONVALUES
+    #TODO TO BE REFACTORED TO ACCEPT ANY SHAPE STATE AND ACTIONVALUES
     def identities(self, state, actionValues):
         identities = [(state, actionValues)]
 

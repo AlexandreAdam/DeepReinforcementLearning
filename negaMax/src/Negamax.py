@@ -49,6 +49,7 @@ class Negamax:
         best_score = float('-inf')
         best_move = None
 
+        #TODO make the board size dynamic
         for x in range(1, 8):
             move = x
             move_allowed, row = board.try_place_piece(move, curr_sign)
