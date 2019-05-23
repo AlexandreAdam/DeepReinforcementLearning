@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """This heuristic algorithm is based on negamax, which is a variant of a minimax
-algorithm.Negamax can be used due to zero-sum property of Connect-4. Heuristic
+algorithm. Negamax can be used due to zero-sum property of Connect-4. Heuristic
 algorithm is needed, because Connect Four has around 4*10^12 (4 trillion)
 different possible games.
 """
+import pickle
 
 class Negamax:
 
@@ -14,11 +15,16 @@ class Negamax:
     max_depth, Integer: maximum depth visited during Negamax algorithm. Higher values increase probability of selecting
     the correct move. However, the time required by the algorithm evolves exponentially with this parameter.
     '''
-    def __init__(self, board, max_depth=4):
+    def __init__(self, board, max_depth=4, import_memory=None):
         self.__listed_indexes = board.segment_indexes
         self.__weights = [1, 8, 128, 99999]
         self.__max_depth = max_depth
-        self.__evaluated = {}
+        #TODO create a memory file
+        #TODO implement alpha-beta pruning algorithm
+        if import_memory is None:
+            self.__evaluated = {}
+        else:
+            self.__evaluated = pickle.load(import_memory)
 
 
 
@@ -143,6 +149,4 @@ class Negamax:
             raise ValueError("Length of list cannot be converted to matrix specified width and height (7 and 6 by default).")
 
 
-# TODO:
-#    - Prefer games that win faster or lose later
-#
+# TODO:Prefer games that win faster or lose later

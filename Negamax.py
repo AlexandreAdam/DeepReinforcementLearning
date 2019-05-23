@@ -145,9 +145,7 @@ class Negamax:
         else:
             raise ValueError("Length of list cannot be converted to matrix specified width and height (7x6 by default).")
 
-# TODO:
-#    - Prefer games that win faster or lose later
-#
+# TODO: Prefer games that win faster or lose later
 
 
 class Board:
