@@ -22,6 +22,7 @@ from memory import Memory
 from model import Residual_CNN
 from funcs import playMatches, playMatchesBetweenVersions
 from settings import run_folder, run_archive_folder
+from dynamic4 import DynamicGameState
 
 np.set_printoptions(suppress=True)
 
@@ -31,7 +32,8 @@ lg.logger_main.info('=*=*=*=*=*=.      NEW LOG      =*=*=*=*=*')
 lg.logger_main.info('=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*')
 
 # Game interface
-env = Game()
+#env = Game()
+env = DynamicGameState(shape=config.GRID_SHAPE)
 
 # If loading an existing neural network, copy the config file to root
 if initialise.INITIAL_RUN_NUMBER is not None:

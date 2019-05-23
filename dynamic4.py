@@ -11,19 +11,22 @@ ATTENTION: WHEN YOU CREATE AN INSTANCE OF THIS CLASS, YOU MUST EITHER SPECIFY BO
 
 class DynamicGameState:
 
-    def __init__(self, board=np.zeros(42, dtype=np.int), playerTurn=1, shape=(6, 7), connect_size=4):
+    def __init__(self, board=None, player_turn=1, shape=(6, 7), connect_size=4):
 
-        if np.prod(shape) != board.size:
-            raise ValueError("board and shape parameters are incompatible.")
+        # if np.prod(shape) != board.size:
+        #     raise ValueError("board and shape parameters are incompatible.")
 
         if connect_size > shape[0] and connect_size > shape[1]:
             raise ValueError("connect_size is bigger than all dimensions. No win possible with these rules.")
 
+        if board is None:
+            self.board = np.zeros(shape[0] * shape[1], dtype=np.int)
+        else:
+            self.board = board
         self.shape = shape
         self.connect_size = connect_size
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
-        self.playerTurn = playerTurn
-        self.board = board
+        self.playerTurn = player_turn
         self.winners = self._winners()
         self.binary = self._binary()
         self.id = self._convertStateToId()
@@ -142,7 +145,7 @@ class DynamicGameState:
         newBoard = np.array(self.board)
         newBoard[action] = self.playerTurn
 
-        newState = DynamicGameState(board=newBoard, playerTurn=-self.playerTurn, shape=self.shape, connect_size=self.connect_size)
+        newState = DynamicGameState(board=newBoard, player_turn=-self.playerTurn, shape=self.shape, connect_size=self.connect_size)
 
         value = 0
         done = 0
@@ -165,7 +168,7 @@ class Game:
         self.currentPlayer = 1
         self.game_shape = (6, 7)
         self.connect_size = 4
-        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), playerTurn=1,
+        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), player_turn=1,
                                           shape=self.game_shape, connect_size=self.connect_size)
         self.actionSpace = np.zeros(42, dtype=np.int)
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
@@ -176,7 +179,7 @@ class Game:
         self.action_size = len(self.actionSpace)
 
     def reset(self):
-        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), playerTurn=1,
+        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), player_turn=1,
                                           shape=self.game_shape, connect_size=self.connect_size)
         self.currentPlayer = 1
         return self.gameState
@@ -215,7 +218,7 @@ class Game:
                     ])
         '''
 
-        identities.append((DynamicGameState(board=currentBoard, playerTurn=state.playerTurn, shape=self.game_shape,
+        identities.append((DynamicGameState(board=currentBoard, player_turn=state.playerTurn, shape=self.game_shape,
                                             connect_size=self.connect_size), currentAV))
 
         return identities

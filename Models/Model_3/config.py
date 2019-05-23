@@ -20,3 +20,5 @@ HIDDEN_CNN_LAYERS = [{'filters': 64, 'kernel_size': (2, 2)}] * 20
 # EVALUATION
 EVAL_EPISODES = 20
 SCORING_THRESHOLD = 1.3
+
+GRID_SHAPE = (6, 7)
