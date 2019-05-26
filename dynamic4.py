@@ -13,14 +13,11 @@ class DynamicGameState:
 
     def __init__(self, board=None, player_turn=1, shape=(6, 7), connect_size=4):
 
-        # if np.prod(shape) != board.size:
-        #     raise ValueError("board and shape parameters are incompatible.")
-
         if connect_size > shape[0] and connect_size > shape[1]:
             raise ValueError("connect_size is bigger than all dimensions. No win possible with these rules.")
 
         if board is None:
-            self.board = np.zeros(shape[0] * shape[1], dtype=np.int)
+            self.board = np.zeros(shape[0] * shape[1], dtype=np.int8)
         else:
             self.board = board
         self.shape = shape

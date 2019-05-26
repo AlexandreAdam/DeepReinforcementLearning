@@ -5,7 +5,7 @@ algorithm. Negamax can be used due to zero-sum property of Connect-4. Heuristic
 algorithm is needed, because Connect Four has around 4*10^12 (4 trillion)
 different possible games.
 """
-import pickle
+import json
 
 class Negamax:
 
@@ -21,10 +21,11 @@ class Negamax:
         self.__max_depth = max_depth
         #TODO create a memory file
         #TODO implement alpha-beta pruning algorithm
+        #TODO change memory so it appends to a json file
         if import_memory is None:
             self.__evaluated = {}
         else:
-            self.__evaluated = pickle.load(import_memory)
+            self.__evaluated = json.load(import_memory)
 
 
 

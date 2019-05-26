@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from Negamax import Negamax
+from negaMax.src.Negamax import Negamax
 
 class HumanPlayer:
     def __init__(self, sign):

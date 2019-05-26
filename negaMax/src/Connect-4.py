@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from Board import Board
-from Players import HumanPlayer, NegaPlayer
+from negaMax.src.Board import Board
+from negaMax.src.Players import HumanPlayer, NegaPlayer
 
 '''
 This class is only used if a human wants to play against the Negamax AI.

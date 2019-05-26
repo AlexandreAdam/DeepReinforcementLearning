@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from negaMax.src.Zobrist_hashing import ZobristHash
+import random
+
 try:
     from termcolor import colored
     colored_imported = True
@@ -15,10 +18,24 @@ class Board:
         self.undo_stack = []
         self.segment_indexes = self.__segment_indexes()
         self.__segment_indexes_by_index = self.__segment_indexes_by_index()
+        self.zod_table = self.instantiate_random_64_bit_integer()
+        self.current_move = {
+            "player" : "X",
+            "row" : 0,
+            "column" : 0
+        }
+        self.current_hash = 0
 
     #Calls must be made as Board[y][x]
     def __build_board(self, width, height):
         return [[' ' for x in range(width)] for y in range(height)]
+
+    def __update_current_move(self, curr_sign, row, column):
+        self.current_move = {
+            "player" : curr_sign,
+            "row" : row,
+            "column" : column
+        }
 
     def try_place_piece(self, move, curr_sign):
         """Tries to put piece to board. Returns True if move is possible and row the piece was put"""
@@ -27,6 +44,9 @@ class Board:
             if self.board[row][move-1] == ' ':
                 self.board[row][move-1] = curr_sign
                 self.undo_stack.append(move - 1)
+                self.__update_current_move(curr_sign=curr_sign,
+                                           row=row,
+                                           column=move - 1)
                 return True, row
 
         return False, None
@@ -122,7 +142,21 @@ class Board:
 
         return s
 
+    def instantiate_random_64_bit_integer(self):
+        # Return a random integer of 64 bits max for each cells in the board
+        random.seed(31415926)
+        return [[[random.randint(1, 2 ** 64 - 1)
+                  for column in range(self.width)]
+                    for row in range(self.height)]
+                     for player in range(2)] # For the two players
+
+
     def __hash__(self):
-        tmp = str(self.board)
-        return hash(tmp)
+        z_hash = ZobristHash(board=self.board,
+                           zod_table=self.zod_table,
+                           previous_hash=self.current_hash,
+                           move_index=self.current_move
+                           )
+        self.current_hash = z_hash.compute_hash()
+        return self.current_hash
 

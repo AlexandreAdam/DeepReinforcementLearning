@@ -3,7 +3,6 @@ algorithm. Negamax can be used due to zero-sum property of Connect-4. Heuristic
 algorithm is needed, because Connect Four has around 4*10^12 (4 trillion)
 different possible games.
 """
-
 # Standard
 try:
     from termcolor import colored
@@ -32,6 +31,7 @@ class Negamax:
     The gamestate is represented as a list in the AlphaGo Zero architecture, while it is represented as a 6x7 matrix 
     in the Negamax architecture. 
     '''
+
     def __negamax(self, board, curr_sign, opponent_sign, depth=0):
 
         # The Negamax algorithm operates on a Board type object. If the board passed as parameter is in list ,

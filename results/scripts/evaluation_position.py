@@ -3,7 +3,7 @@ import re
 import funcs
 import loggers as lg
 import memory as Memory
-from model import Residual_CNN, CNN
+from model import Residual_CNN
 import config
 from game import Game, GameState
 from agent import Agent
@@ -20,7 +20,7 @@ color = ['b', 'r', 'c', 'm', 'g']
 
 env = Game()
 # create an untrained neural network objects from the config file
-player1_NN = CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
+player1_NN = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
 # player2_NN = CNN(config.REG_CONST, config.LEARNING_RATE, (2,) +  env.grid_shape,   env.action_size, config.HIDDEN_CNN_LAYERS)
 
 path1 = './run/models/'

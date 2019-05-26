@@ -8,11 +8,11 @@ import numpy as np
 # Local
 import config
 import initialise
-from Negamax import Negamax
-from Negamax import Board
-from game import Game
+from negaMax.src.Negamax import Negamax
+from negaMax.src.Board import Board
 from model import Residual_CNN
 from agent import Agent
+from dynamic4 import DynamicGameState, Game
 
 
 class ZvNMatch:
@@ -58,13 +58,13 @@ class ZvNMatch:
 
         while not matchEnded:
 
-            # Player 1 (+) chooses
+            # Player 1 (X) chooses
             (action, pi, value, NN_value) = self.zeroPlayer.act(self.zeroEnv.gameState, 0)
             #print("Zero (1, +) plays cell number: ", action)
 
             # Player 1 acts on both grids
             self.zeroEnv.step(action)
-            self.negaEnv.board[action // self.negaEnv.width][action%self.negaEnv.width] = '+'
+            self.negaEnv.board[action // self.negaEnv.width][action%self.negaEnv.width] = 'X'
 
             # Check if Zero player wins
             if self.zeroEnv.gameState._checkForEndGame():
@@ -73,12 +73,12 @@ class ZvNMatch:
                 else:
                     return 1
 
-            # Player 2 (-) chooses
+            # Player 2 (O) chooses
             self.negaPlayer = Negamax(self.negaEnv, self.negaMaxDepth)
-            move = self.negaPlayer.calculate_move(self.negaEnv, "-", "+")
+            move = self.negaPlayer.calculate_move(self.negaEnv, "O", "X")
 
             # Player 2 acts on both grids
-            self.negaEnv.try_place_piece(move, "-")
+            self.negaEnv.try_place_piece(move, "O")
 
             # Must convert row to action
             #print("Nega (-1, -) plays column: ", move)
