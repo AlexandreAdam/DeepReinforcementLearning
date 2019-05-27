@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from negaMax.src.Board import Board
-from negaMax.src.Players import HumanPlayer, NegaPlayer
+from negaMax.src.Players import HumanPlayer, NegaPlayer, AlphaBetaPlayer
 
 '''
 This class is only used if a human wants to play against the Negamax AI.
@@ -10,7 +10,7 @@ This class is only used if a human wants to play against the Negamax AI.
 def play():
     board = Board()
     player1 = HumanPlayer('X')
-    player2 = NegaPlayer('O', 6)
+    player2 = NegaPlayer('O', 4)
 
     print ("Let's play connect four!\nTo place a move, type a number [1-7]")
 

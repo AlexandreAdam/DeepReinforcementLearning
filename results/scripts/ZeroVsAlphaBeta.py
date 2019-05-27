@@ -1,5 +1,5 @@
 """
-Implementation of competitions between AlphaGo Zero and NegaMax.
+Implementation of competitions between AlphaGo Zero and alphaMax.
 """
 
 # Third-Party
@@ -8,8 +8,7 @@ import numpy as np
 # Local
 import config
 import initialise
-from negaMax.src.Negamax import Negamax
-from negaMax.src.AlphaBeta import AlphaBeta, Node
+from negaMax.src.AlphaBeta import AlphaBeta
 from negaMax.src.Board import Board
 from model import Residual_CNN
 from agent import Agent
@@ -20,21 +19,21 @@ class ZvNMatch:
 
     '''
     Upon instantiating the object, a series of matches takes place between a certain model of AlphaGo Zero and the
-    negaMax variant of the heuristic min max solution to Connect4.
+    alphaMax variant of the heuristic min max solution to Connect4.
     '''
 
-    def __init__(self, model_number, nbMatches, negaMaxDepth=4):
+    def __init__(self, model_number, nbMatches, alphaMaxDepth=4):
 
         # Determines both probability of choosing correct move and time to complete.
-        self.negaMaxDepth = negaMaxDepth
+        self.alphaMaxDepth = alphaMaxDepth
 
         # Environments
-        self.zeroEnv, self.negaEnv = None, None
+        self.zeroEnv, self.alphaEnv = None, None
         self.reset_envs()
-
+        
         # Players
         self.zeroPlayer = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (2,) + self.zeroEnv.grid_shape,   self.zeroEnv.action_size, config.HIDDEN_CNN_LAYERS)
-        self.negaPlayer = Negamax(self.negaEnv)
+        self.alphaPlayer = AlphaBeta(board=self.alphaEnv, max_depth=alphaMaxDepth)
 
         # Setting weights and initiating agent.
         m_tmp = self.zeroPlayer.read(initialise.INITIAL_RUN_NUMBER, model_number)
@@ -49,8 +48,8 @@ class ZvNMatch:
             self.reset_envs()
 
     def reset_envs(self):
-        self.zeroEnv = Game() #Player 1 (or "+")
-        self.negaEnv = Board() #Player 2 (or "-")
+        self.zeroEnv = Game() #Player 1 (or "X")
+        self.alphaEnv = Board() #Player 2 (or "O")
 
     # Plays a match and returns the results.
     def playMatch(self):
@@ -65,9 +64,10 @@ class ZvNMatch:
 
             # Player 1 acts on both grids
             self.zeroEnv.step(action)
-            self.negaEnv.board[action // self.negaEnv.width][action%self.negaEnv.width] = 'X'
+            move = action % self.alphaEnv.width
+            self.alphaEnv.act(move, current_sign="X")
             print("AlphaZero turn")
-            print(self.negaEnv)
+            print(self.alphaEnv)
 
             # Check if Zero player wins
             if self.zeroEnv.gameState._checkForEndGame():
@@ -77,23 +77,23 @@ class ZvNMatch:
                     return 1
 
             # Player 2 (O) chooses
-            self.negaPlayer = Negamax(self.negaEnv, self.negaMaxDepth)
-            move = self.negaPlayer.calculate_move(self.negaEnv, "O", "X")
+            self.alphaPlayer = AlphaBeta(board=self.alphaEnv,  max_depth=self.alphaMaxDepth)
+            move = self.alphaPlayer.calculate_move()
 
 
             # Player 2 acts on both grids
-            self.negaEnv.try_place_piece(move, "O")
-            print("Negamax turn")
-            print(self.negaEnv)
+            self.alphaEnv.act(move, "O")
+            print("alphamax turn")
+            print(self.alphaEnv)
 
             # Must convert row to action
-            #print("Nega (-1, -) plays column: ", move)
+            #print("alpha (-1, -) plays column: ", move)
             for y in range(6, 0, -1):
                 if self.zeroEnv.gameState.board[7*(y-1)+move-1] == 0:
                     self.zeroEnv.step(7*(y-1)+move-1)
                     break
 
-            # Check if Negamaz player wins
+            # Check if alphamaz player wins
             if self.zeroEnv.gameState._checkForEndGame():
                 if np.count_nonzero(self.zeroEnv.gameState.board) == 42:
                     return 0
@@ -101,7 +101,7 @@ class ZvNMatch:
                     return -1
 
             #print(self.zeroEnv.gameState.board)
-            #for x in self.negaEnv.board:
+            #for x in self.alphaEnv.board:
             #    print(x)
 
 

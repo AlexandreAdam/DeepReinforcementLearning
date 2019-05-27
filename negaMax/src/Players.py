@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from negaMax.src.Negamax import Negamax
+from negaMax.src.AlphaBeta import AlphaBeta, Node
+import numpy as np
 
 class HumanPlayer:
     def __init__(self, sign):
@@ -35,3 +37,14 @@ class NegaPlayer:
         move = n.calculate_move(board, self.sign, opponent.sign)
         return move
 
+class AlphaBetaPlayer:
+    def __init__(self, sign, depth):
+        self.sign = sign
+        self.depth = depth
+
+    def get_move(self, board, opponent):
+        origin= Node(board, depth=4, current_player=self.sign)
+        alpha_beta = AlphaBeta(board, max_depth=self.depth, origin=origin)
+
+        move = alpha_beta.calculate_move()
+        return move

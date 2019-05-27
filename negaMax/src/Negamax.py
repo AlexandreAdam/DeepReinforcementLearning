@@ -6,6 +6,7 @@ algorithm is needed, because Connect Four has around 4*10^12 (4 trillion)
 different possible games.
 """
 import json
+import numpy as np
 
 class Negamax:
 
@@ -15,18 +16,18 @@ class Negamax:
     max_depth, Integer: maximum depth visited during Negamax algorithm. Higher values increase probability of selecting
     the correct move. However, the time required by the algorithm evolves exponentially with this parameter.
     '''
-    def __init__(self, board, max_depth=4, import_memory=None):
+    def __init__(self, board, max_depth=4, memory_file=None):
         self.__listed_indexes = board.segment_indexes
         self.__weights = [1, 8, 128, 99999]
         self.__max_depth = max_depth
         #TODO create a memory file
         #TODO implement alpha-beta pruning algorithm
         #TODO change memory so it appends to a json file
-        if import_memory is None:
+        if memory_file is None:
             self.__evaluated = {}
         else:
-            self.__evaluated = json.load(import_memory)
-
+            self.__evaluated = json.load(memory_file)
+        self.best_score = board.width * board.height
 
 
     '''
@@ -75,7 +76,7 @@ class Negamax:
             else:
                 best_submove, best_subscore = self.__negamax(board, opponent_sign, curr_sign, depth + 1)
                 best_subscore *= -1
-            board.undo()
+            board.undo_one_move()
 
             if best_subscore > best_score:
                 best_score = best_subscore
@@ -131,17 +132,16 @@ class Negamax:
     '''
     def convertListToMatrix(self, board, width = 7, height = 6):
 
-        newBoard = [[' ' for x in range(width)] for y in range(height)]
+        new_board = [[' ' for x in range(width)] for y in range(height)]
 
-
-        if(len(board) == width*height):
+        if len(board) == width*height:
             counter = 0
             for x in range(width):
                 for y in range(height):
                     if board[counter] is 1:
-                        newBoard[y][x] = "X"
+                        new_board[y][x] = "X"
                     elif board[counter] is -1:
-                        newBoard[y][x] = "O"
+                        new_board[y][x] = "O"
                     counter+=1
 
             return [[' ' for x in range(width)] for y in range(height)]
