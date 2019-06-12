@@ -6,9 +6,6 @@ Reminders (continuous):
 - Maintain language consistency (directories, comments, Git, etc)
 
 Eric:
-- Implement favoritism for earlier wins in negamax algorithm
-- Implement interface for ResNet Vs Negamax competitions and result analysis
-- Develop dynamic connect 4 and Negamax (2n X 7)
 - Optimal learning rate analysis
 
 Alex:
@@ -19,4 +16,4 @@ Alex:
 
 Unassigned:
     -run_archive_folder and run_folder lead to same path, must remove one
-    -config file is not loaded from Model directory. Confight file must be loaded according to chosen model (1, 2, 3)
+    -config file is not loaded from Model directory. Config file must be loaded according to chosen model (1, 2, 3)
