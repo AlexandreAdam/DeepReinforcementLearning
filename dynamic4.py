@@ -103,7 +103,6 @@ class DynamicGameState:
 
     def _winners(self):
         index_board = np.arange(0, self.shape[0] * self.shape[1], 1).astype(np.int).reshape(self.shape)
-        #print(index_board)
         winners = []
 
         # Horizontals
@@ -159,25 +158,25 @@ class DynamicGameState:
         logger.info('--------------')
 
 
-class Game:
+class DynamicGame:
 
-    def __init__(self):
+    def __init__(self, grid_shape=(6, 7)):
         self.currentPlayer = 1
-        self.game_shape = (6, 7)
+        self.grid_shape = grid_shape
         self.connect_size = 4
-        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), player_turn=1,
-                                          shape=self.game_shape, connect_size=self.connect_size)
+        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.grid_shape), dtype=np.int), player_turn=1,
+                                          shape=self.grid_shape, connect_size=self.connect_size)
         self.actionSpace = np.zeros(42, dtype=np.int)
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
-        self.grid_shape = self.game_shape
-        self.input_shape = (2, self.game_shape[0], self.game_shape[0])
+        self.grid_shape = self.grid_shape
+        self.input_shape = (2, self.grid_shape[0], self.grid_shape[0])
         self.name = 'Dynamic4'
         self.state_size = len(self.gameState.binary)
         self.action_size = len(self.actionSpace)
 
     def reset(self):
-        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.game_shape), dtype=np.int), player_turn=1,
-                                          shape=self.game_shape, connect_size=self.connect_size)
+        self.gameState = DynamicGameState(board=np.zeros(np.prod(self.grid_shape), dtype=np.int), player_turn=1,
+                                          shape=self.grid_shape, connect_size=self.connect_size)
         self.currentPlayer = 1
         return self.gameState
 
@@ -188,34 +187,25 @@ class Game:
         info = None
         return next_state, value, done, info
 
-    #TODO TO BE REFACTORED TO ACCEPT ANY SHAPE STATE AND ACTIONVALUES
+    # REFACTORED, TO BE DEBUGGED
     def identities(self, state, actionValues):
         identities = [(state, actionValues)]
 
         currentBoard = state.board
         currentAV = actionValues
 
-        '''
-        currentBoard = np.array([
-              currentBoard[6], currentBoard[5],currentBoard[4], currentBoard[3], currentBoard[2], currentBoard[1], currentBoard[0]
-            , currentBoard[13], currentBoard[12],currentBoard[11], currentBoard[10], currentBoard[9], currentBoard[8], currentBoard[7]
-            , currentBoard[20], currentBoard[19],currentBoard[18], currentBoard[17], currentBoard[16], currentBoard[15], currentBoard[14]
-            , currentBoard[27], currentBoard[26],currentBoard[25], currentBoard[24], currentBoard[23], currentBoard[22], currentBoard[21]
-            , currentBoard[34], currentBoard[33],currentBoard[32], currentBoard[31], currentBoard[30], currentBoard[29], currentBoard[28]
-            , currentBoard[41], currentBoard[40],currentBoard[39], currentBoard[38], currentBoard[37], currentBoard[36], currentBoard[35]
-            ])
+        tempBoard = np.copy(currentBoard).reshape(self.grid_shape)
+        tempAV = np.copy(currentAV).reshape(self.grid_shape)
 
-        currentAV = np.array([
-            currentAV[6], currentAV[5],currentAV[4], currentAV[3], currentAV[2], currentAV[1], currentAV[0]
-            , currentAV[13], currentAV[12],currentAV[11], currentAV[10], currentAV[9], currentAV[8], currentAV[7]
-            , currentAV[20], currentAV[19],currentAV[18], currentAV[17], currentAV[16], currentAV[15], currentAV[14]
-            , currentAV[27], currentAV[26],currentAV[25], currentAV[24], currentAV[23], currentAV[22], currentAV[21]
-            , currentAV[34], currentAV[33],currentAV[32], currentAV[31], currentAV[30], currentAV[29], currentAV[28]
-            , currentAV[41], currentAV[40],currentAV[39], currentAV[38], currentAV[37], currentAV[36], currentAV[35]
-                    ])
-        '''
+        for y in range(self.grid_shape[0]):
+            for x in range(self.grid_shape[1]):
+                tempBoard[y, x] = currentBoard[y, self.grid_shape[1] - x - 1]
+                tempAV[y, x] = currentAV[y, self.grid_shape[1] - x - 1]
 
-        identities.append((DynamicGameState(board=currentBoard, player_turn=state.playerTurn, shape=self.game_shape,
+        currentBoard = tempBoard.flatten()
+        currentAV = tempAV.flatten()
+
+        identities.append((DynamicGameState(board=currentBoard, player_turn=state.playerTurn, shape=self.grid_shape,
                                             connect_size=self.connect_size), currentAV))
 
         return identities
