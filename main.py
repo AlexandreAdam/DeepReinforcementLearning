@@ -32,8 +32,8 @@ lg.logger_main.info('=*=*=*=*=*=.      NEW LOG      =*=*=*=*=*')
 lg.logger_main.info('=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*')
 
 # Game interface
-env = DynamicGame(grid_shape=config.GRID_SHAPE)
-# env = Game()
+#env = DynamicGame(grid_shape=config.GRID_SHAPE)
+env = Game()
 
 # If loading an existing neural network, copy the config file to root
 if initialise.INITIAL_RUN_NUMBER is not None:
