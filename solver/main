@@ -1,0 +1,19 @@
+
+
+from dynamic4 import DynamicGame
+from solver.Node import Node
+from solver.Solver import Solver
+
+
+game = DynamicGame()
+game.step(35)
+game.step(28)
+game.step(21)
+game.step(14)
+game.step(7)
+game.step(0)
+print(game)
+
+solver = Solver(game.gameState)
+#print(solver.position, solver.mask)
+print(solver.negamax(solver.root_node, -42, 42))
