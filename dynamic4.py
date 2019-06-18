@@ -9,6 +9,7 @@ ATTENTION: WHEN YOU CREATE AN INSTANCE OF THIS CLASS, YOU MUST EITHER SPECIFY BO
 """
 
 
+
 class DynamicGameState:
 
     def __init__(self, board=None, player_turn=1, shape=(6, 7), connect_size=4):
@@ -20,10 +21,13 @@ class DynamicGameState:
             self.board = np.zeros(shape[0] * shape[1], dtype=np.int8)
         else:
             self.board = board
+
+        self.position = []
         self.shape = shape
         self.connect_size = connect_size
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
         self.playerTurn = player_turn
+        self.total_moves = 0
         self.winners = self._winners()
         self.binary = self._binary()
         self.id = self._convertStateToId()
@@ -142,6 +146,9 @@ class DynamicGameState:
         newBoard[action] = self.playerTurn
 
         newState = DynamicGameState(board=newBoard, player_turn=-self.playerTurn, shape=self.shape, connect_size=self.connect_size)
+        newState.position = self.position
+        newState.position.append(action - (action//self.shape[1])*self.shape[1])
+        newState.total_moves = self.total_moves + 1
 
         value = 0
         done = 0
@@ -161,16 +168,15 @@ class DynamicGameState:
 class DynamicGame:
 
     def __init__(self, grid_shape=(6, 7)):
+        self.name = 'Dynamic4'
         self.currentPlayer = 1
         self.grid_shape = grid_shape
+        self.input_shape = (2, self.grid_shape[0], self.grid_shape[0])
         self.connect_size = 4
         self.gameState = DynamicGameState(board=np.zeros(np.prod(self.grid_shape), dtype=np.int), player_turn=1,
                                           shape=self.grid_shape, connect_size=self.connect_size)
         self.actionSpace = np.zeros(42, dtype=np.int)
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
-        self.grid_shape = self.grid_shape
-        self.input_shape = (2, self.grid_shape[0], self.grid_shape[0])
-        self.name = 'Dynamic4'
         self.state_size = len(self.gameState.binary)
         self.action_size = len(self.actionSpace)
 
@@ -209,4 +215,17 @@ class DynamicGame:
                                             connect_size=self.connect_size), currentAV))
 
         return identities
+
+    def __str__(self):
+        return str(self.gameState.board.reshape(self.grid_shape))
+
+
+if __name__ == '__main__':
+
+    game = DynamicGame()
+    game.step(38)
+    game.step(31)
+    game.step(39)
+    print(game.gameState.position)
+    print(game)
 
