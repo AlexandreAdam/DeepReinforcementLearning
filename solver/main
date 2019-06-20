@@ -5,22 +5,24 @@ from solver.Node import Node
 from solver.Solver import Solver
 import numpy as np
 
-game = DynamicGame()
+game = DynamicGame(grid_shape=(4, 5))
 
-game.step(38)
-game.step(37)
-game.step(31)
-game.step(30)
-game.step(24)
-game.step(23)
-game.step(39)
-game.step(36)
-game.step(32)
-game.step(29)
-game.step(25)
-game.step(22)
+game.step(18)
+game.step(17)
+game.step(13)
+game.step(16)
+game.step(11)
+game.step(19)
+game.step(14)
+game.step(12)
 
 print(game)
 
 solver = Solver(game.gameState)
 print(solver.negamax(solver.root_node, -float('inf'), float('inf')))
+
+
+"""
+BUG:
+    -ONLY RETURNS VALID SCORE WHEN NEXT MOVE IS WINNER, RECURSION DOES NOT RETURN VALID SCORES
+"""
