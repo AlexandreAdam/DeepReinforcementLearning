@@ -12,6 +12,8 @@ class Solver:
         self.board = gamestate.board
         self.player_turn = gamestate.playerTurn
         self.total_moves = gamestate.total_moves
+        self.nodes_explored = 0
+
 
         # Get binary representation of the position and mask from the board
         self.position, self.mask = self.get_binary_rep(self.board, self.player_turn)
@@ -21,7 +23,7 @@ class Solver:
         for column in range(len(self.exploration_order)):
             self.exploration_order[column] = self.shape[1]//2 + (1-2*(column % 2)) * (column+1)//2
 
-        self.root_node = Node(self.position, self.mask, self.total_moves)
+        self.root_node = Node(self.position, self.mask, self.total_moves, self.shape)
 
     def get_binary_rep(self, board, player_turn):
 
@@ -46,7 +48,15 @@ class Solver:
         # Return the binary representation of the position and mask
         return int(''.join(map(str, position)), 2), int(''.join(map(str, mask)), 2)
 
+    def solve(self, node, weak=False):
+        if weak:
+            return self.negamax(node, -1, 1)
+        else:
+            return self.negamax(node, -float('inf'), float('inf'))
+
     def negamax(self, node, alpha, beta):
+
+        self.nodes_explored += 1
 
         # Check for draw game
         if node.total_moves == node.WIDTH * node.HEIGHT:
@@ -56,11 +66,11 @@ class Solver:
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
             if node.can_play(column_nb) and node.is_winning_move(column_nb):
-                return round((node.WIDTH*node.HEIGHT+1 - node.total_moves)/2)
+                return (node.WIDTH * node.HEIGHT + 1 - node.total_moves) // 2
 
         # Compute maximum and minimum possible scores for pruning
-        min_potential = (node.WIDTH*node.HEIGHT - 2 - node.total_moves)//2
-        max_potential = round((node.WIDTH*node.HEIGHT - 1 - node.total_moves)/2)
+        # min_potential = (node.WIDTH * node.HEIGHT - 2 - node.total_moves) // 2
+        max_potential = (node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2
 
         # # Min pruning
         # if alpha < min_potential:
@@ -76,18 +86,17 @@ class Solver:
 
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
+
             if node.can_play(column_nb):
-
-                print(node.total_moves)
-
                 # Create a new Node (copy of current), play the column and get the score
                 next_node = Node(position=node.position, mask=node.mask, total_moves=node.total_moves, shape=node.shape)
                 next_node.play(column_nb)
                 score = -self.negamax(next_node, -beta, -alpha)
+                #print(score)
 
                 if score >= beta:
                     return score
                 if score > alpha:
-                    alpha = -score
+                    alpha = score
 
         return alpha

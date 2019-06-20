@@ -30,9 +30,9 @@ class Node:
         return (self.mask & self.top_mask(column_nb)) == 0
 
     def play(self, column_nb):
-
         self.position = self.position ^ self.mask  # Invert the position
-        self.mask = self.mask | self.bottom_mask(column_nb)  # Update the mask
+        # self.mask = self.mask | self.bottom_mask(column_nb)  # Update the mask
+        self.mask = self.mask | self.mask + self.bottom_mask(column_nb)  # Update the mask
         self.total_moves += 1  # Update the move counter
 
     def is_winning_move(self, column_nb):
