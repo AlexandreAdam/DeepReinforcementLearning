@@ -3,17 +3,24 @@
 from dynamic4 import DynamicGame
 from solver.Node import Node
 from solver.Solver import Solver
-
+import numpy as np
 
 game = DynamicGame()
-game.step(35)
-game.step(28)
-game.step(21)
-game.step(14)
-game.step(7)
-game.step(0)
+
+game.step(38)
+game.step(37)
+game.step(31)
+game.step(30)
+game.step(24)
+game.step(23)
+game.step(39)
+game.step(36)
+game.step(32)
+game.step(29)
+game.step(25)
+game.step(22)
+
 print(game)
 
 solver = Solver(game.gameState)
-#print(solver.position, solver.mask)
-print(solver.negamax(solver.root_node, -42, 42))
+print(solver.negamax(solver.root_node, -float('inf'), float('inf')))

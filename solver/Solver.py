@@ -2,6 +2,7 @@ from solver.Node import Node
 import numpy as np
 
 
+
 class Solver:
 
     def __init__(self, gamestate):
@@ -22,33 +23,52 @@ class Solver:
 
         self.root_node = Node(self.position, self.mask, self.total_moves)
 
-    @staticmethod
-    def get_binary_rep(board, player_turn):
+    def get_binary_rep(self, board, player_turn):
+
         # Initialize
         mask, position = np.zeros(board.size, dtype=int), np.zeros(board.size, dtype=int)
 
         # Fill the mask and position
-        mask[np.where(board != 0)[0]], position[np.where(board == player_turn)[0]] = 1, 1
+        mask[np.where(board != 0)[0]] = 1
+        position[np.where(board == player_turn)[0]] = 1
 
-        mask = bin(int(''.join(map(str, mask)), 2))
-        position = bin(int(''.join(map(str, position)), 2))
+        mask = mask.reshape(self.shape)
+        position = position.reshape(self.shape)
 
-        return int(position, 2), int(mask, 2)
+        # Add the ghost row
+        mask = np.insert(mask, 0, np.zeros(self.shape[1]), axis=0)
+        position = np.insert(position, 0, np.zeros(self.shape[1]), axis=0)
 
-    # TO DEBUG
+        # Transpose the mask and position (Dynamic4 representation is the flipped transpose of the Node representation)
+        mask = np.flip(mask, axis=1).transpose().reshape((self.shape[0]+1)*self.shape[1])
+        position = np.flip(position, axis=1).transpose().reshape((self.shape[0]+1)*self.shape[1])
+
+        # Return the binary representation of the position and mask
+        return int(''.join(map(str, position)), 2), int(''.join(map(str, mask)), 2)
+
     def negamax(self, node, alpha, beta):
 
         # Check for draw game
         if node.total_moves == node.WIDTH * node.HEIGHT:
             return 0
 
+        # Check if the current node is a leaf
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
-            if node.can_play(column_nb) and node.is_winning_move:
-                return node.WIDTH*node.HEIGHT+1 - node.total_moves/2
+            if node.can_play(column_nb) and node.is_winning_move(column_nb):
+                return round((node.WIDTH*node.HEIGHT+1 - node.total_moves)/2)
 
-        max_potential = node.WIDTH*node.HEIGHT-1 - node.total_moves/2
+        # Compute maximum and minimum possible scores for pruning
+        min_potential = (node.WIDTH*node.HEIGHT - 2 - node.total_moves)//2
+        max_potential = round((node.WIDTH*node.HEIGHT - 1 - node.total_moves)/2)
 
+        # # Min pruning
+        # if alpha < min_potential:
+        #     alpha = min_potential
+        #     if alpha >= beta:
+        #         return alpha
+
+        # Max pruning
         if beta > max_potential:
             beta = max_potential
             if alpha >= beta:
@@ -58,10 +78,13 @@ class Solver:
             column_nb = self.exploration_order[column_nb]
             if node.can_play(column_nb):
 
-                # THE MASK MUST BE INVERTED EVERY TIME THE PLAYER TURN CHANGES? NOT DONE YET ?????
-                next_node = Node(position=node.position, mask=node.mask, shape=node.shape, connect_size=node.connect_size)
+                print(node.total_moves)
+
+                # Create a new Node (copy of current), play the column and get the score
+                next_node = Node(position=node.position, mask=node.mask, total_moves=node.total_moves, shape=node.shape)
                 next_node.play(column_nb)
                 score = -self.negamax(next_node, -beta, -alpha)
+
                 if score >= beta:
                     return score
                 if score > alpha:
