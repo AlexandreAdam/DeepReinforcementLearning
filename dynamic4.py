@@ -19,15 +19,16 @@ class DynamicGameState:
 
         if board is None:
             self.board = np.zeros(shape[0] * shape[1], dtype=np.int8)
+            self.total_moves = 0
         else:
             self.board = board
+            self.total_moves = np.count_nonzero(board)
 
         self.position = []
         self.shape = shape
         self.connect_size = connect_size
         self.pieces = {'1': 'X', '0': '-', '-1': 'O'}
         self.playerTurn = player_turn
-        self.total_moves = 0
         self.winners = self._winners()
         self.binary = self._binary()
         self.id = self._convertStateToId()
