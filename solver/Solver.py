@@ -55,7 +55,7 @@ class Solver:
     # Returns best column to play. Only works for root node given to constructor.
     def get_action(self):
 
-        scores = np.array([None] * self.root_node.WIDTH)
+        scores = np.array([-float('inf')] * self.root_node.WIDTH)
 
         for column_nb in range(self.root_node.WIDTH):
             if self.root_node.can_play(column_nb):
@@ -65,8 +65,9 @@ class Solver:
                 next_node.play(column_nb)
                 scores[column_nb] = -self.negamax(node=next_node, color=-self.player_turn)
 
+        print(scores)
+        # scores[np.where(scores == None)[0]] = -float('inf')
         best_column = np.argsort(scores)[-1]
-        # print(best_column)
 
         # Convert column to action
         for y in range(self.shape[0]-1, -1, -1):
