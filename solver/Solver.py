@@ -2,8 +2,11 @@ from solver.Node import Node
 import numpy as np
 
 
-
 class Solver:
+
+    """
+    Dynamic4 solver. Can be perfect or not depending on depth parameter.
+    """
 
     def __init__(self, gamestate):
 
@@ -14,17 +17,18 @@ class Solver:
         self.total_moves = gamestate.total_moves
         self.nodes_explored = 0
 
-
         # Get binary representation of the position and mask from the board
         self.position, self.mask = self.get_binary_rep(self.board, self.player_turn)
+
+        # Root node
+        self.root_node = Node(self.position, self.mask, self.total_moves, self.shape)
 
         # Define exploration order of columns to increase pruning
         self.exploration_order = [None for x in range(self.shape[1])]
         for column in range(len(self.exploration_order)):
             self.exploration_order[column] = self.shape[1]//2 + (1-2*(column % 2)) * (column+1)//2
 
-        self.root_node = Node(self.position, self.mask, self.total_moves, self.shape)
-
+    # Convert board attribute (numpy.ndarray) to single integer (binary representation)
     def get_binary_rep(self, board, player_turn):
 
         # Initialize
@@ -48,55 +52,64 @@ class Solver:
         # Return the binary representation of the position and mask
         return int(''.join(map(str, position)), 2), int(''.join(map(str, mask)), 2)
 
-    def solve(self, node, weak=False):
-        if weak:
-            return self.negamax(node, -1, 1)
-        else:
-            return self.negamax(node, -float('inf'), float('inf'))
+    # Returns best column to play. Only works for root node given to constructor.
+    def get_action(self):
 
-    def negamax(self, node, alpha, beta):
+        scores = np.array([None] * self.root_node.WIDTH)
+
+        for column_nb in range(self.root_node.WIDTH):
+            if self.root_node.can_play(column_nb):
+                # Create and update child Node
+                next_node = Node(position=self.root_node.position, mask=self.root_node.mask,
+                                 total_moves=self.root_node.total_moves, shape=self.root_node.shape)
+                next_node.play(column_nb)
+                scores[column_nb] = -self.negamax(node=next_node, color=-self.player_turn)
+
+        best_column = np.argsort(scores)[-1]
+        # print(best_column)
+
+        # Convert column to action
+        for y in range(self.shape[0]-1, -1, -1):
+            if self.board[y*self.shape[1] + best_column] == 0:
+                return y*self.shape[1] + best_column
+
+    def negamax(self, node, alpha=-float('inf'), beta=float('inf'), color=1, depth=float('inf')):
 
         self.nodes_explored += 1
 
-        # Check for draw game
+        # Base case 1 (Depth)
+        if depth <= 0:
+            return 0  # TO ADD HEURISTIC FUNCTION HERE
+
+        # Base case 2 (Leaf node, draw)
         if node.total_moves == node.WIDTH * node.HEIGHT:
             return 0
 
-        # Check if the current node is a leaf
+        # Base case 3 (Leaf node, victory)
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
             if node.can_play(column_nb) and node.is_winning_move(column_nb):
-                return (node.WIDTH * node.HEIGHT + 1 - node.total_moves) // 2
+                return color * ((node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2)  # TO DO: DOUBLE CHECK EVALUATION []
 
-        # Compute maximum and minimum possible scores for pruning
-        # min_potential = (node.WIDTH * node.HEIGHT - 2 - node.total_moves) // 2
-        max_potential = (node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2
+        value = -float('inf')
 
-        # # Min pruning
-        # if alpha < min_potential:
-        #     alpha = min_potential
-        #     if alpha >= beta:
-        #         return alpha
-
-        # Max pruning
-        if beta > max_potential:
-            beta = max_potential
-            if alpha >= beta:
-                return beta
-
+        # Recursion on each child
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
 
             if node.can_play(column_nb):
-                # Create a new Node (copy of current), play the column and get the score
+                # Create and update child Node
                 next_node = Node(position=node.position, mask=node.mask, total_moves=node.total_moves, shape=node.shape)
                 next_node.play(column_nb)
-                score = -self.negamax(next_node, -beta, -alpha)
-                #print(score)
 
-                if score >= beta:
-                    return score
-                if score > alpha:
-                    alpha = score
+                # Get the value of the child Node
+                value = max(value, -self.negamax(next_node, -beta, -alpha, color=-color, depth=depth-1))
 
-        return alpha
+                # Update boundaries
+                alpha = max(alpha, value)
+
+                # Pruning
+                if alpha >= beta:
+                    break
+
+        return value
