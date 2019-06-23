@@ -195,7 +195,8 @@ def double_menace():
 
     for x in range(3):
         solver = Solver(game.gameState)
-        game.step(solver.get_action())
+        action, done = solver.get_action()
+        game.step(action)
         total_nodes += solver.nodes_explored
         print('\n', game)
 
@@ -228,7 +229,8 @@ def counter_double_menace():
     print('Initial state: \n', game)
 
     solver = Solver(game.gameState)
-    game.step(solver.get_action())
+    action, done = solver.get_action()
+    game.step(action)
     print('\n', game)
 
     end_time = time()
@@ -253,7 +255,8 @@ def first_move():
 
     print('\n', game)
     solver = Solver(game.gameState)
-    game.step(solver.get_action())
+    action, done = solver.get_action()
+    game.step(action)
 
     end_time = time()
 
@@ -272,4 +275,4 @@ if __name__ == '__main__':
 
     double_menace()
     counter_double_menace()
-    # first_move()
+    first_move()
