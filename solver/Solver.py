@@ -53,21 +53,23 @@ class Solver:
         return int(''.join(map(str, position)), 2), int(''.join(map(str, mask)), 2)
 
     # Returns best column to play. Only works for root node given to constructor.
-    def get_action(self):
-
+    def get_col(self):
         scores = np.array([-float('inf')] * self.root_node.WIDTH)
 
         for column_nb in range(self.root_node.WIDTH):
             if self.root_node.can_play(column_nb):
+
                 # Create and update child Node
                 next_node = Node(position=self.root_node.position, mask=self.root_node.mask,
                                  total_moves=self.root_node.total_moves, shape=self.root_node.shape)
                 next_node.play(column_nb)
                 scores[column_nb] = -self.negamax(node=next_node, color=-self.player_turn)
 
-        print(scores)
-        # scores[np.where(scores == None)[0]] = -float('inf')
-        best_column = np.argsort(scores)[-1]
+        return np.argsort(scores)[-1]
+
+    # Returns best action to play. Only works for root node given to constructor.
+    def get_action(self):
+        best_column = self.get_col()
 
         # Convert column to action
         for y in range(self.shape[0]-1, -1, -1):
