@@ -54,7 +54,7 @@ class Solver:
 
     # Returns best column to play. Only works for root node given to constructor.
     def get_col(self):
-        scores = np.array([-99999999] * self.root_node.WIDTH, dtype=int)
+        scores = np.array([self.player_turn*-99999999] * self.root_node.WIDTH, dtype=int)
 
         for column_nb in range(self.root_node.WIDTH):
             if self.root_node.can_play(column_nb):
@@ -63,9 +63,12 @@ class Solver:
                 next_node = Node(position=self.root_node.position, mask=self.root_node.mask,
                                  total_moves=self.root_node.total_moves, shape=self.root_node.shape)
                 next_node.play(column_nb)
-                scores[column_nb] = -self.negamax(node=next_node, color=-self.player_turn)
+                scores[column_nb] = self.negamax(node=next_node, color=-self.player_turn)
 
-        best_scores = np.where(scores == np.amax(scores))[0]
+        if self.player_turn == -1:
+            best_scores = np.where(scores == np.amin(scores))[0]
+        else:
+            best_scores = np.where(scores == np.amax(scores))[0]
 
         # If more than one column have the same score, pick one at random
         best_col = int(np.random.choice(best_scores, 1)[0])
@@ -97,7 +100,7 @@ class Solver:
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
             if node.can_play(column_nb) and node.is_winning_move(column_nb):
-                return color * ((node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2)  # TO DO: DOUBLE CHECK EVALUATION []
+                return color * ((node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2)
 
         value = -float('inf')
 
