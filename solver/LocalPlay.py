@@ -1,17 +1,14 @@
 import sys
-
-from dynamic4 import DynamicGame, DynamicGameState
+from dynamic4 import DynamicGame
 import pygame as pg
-import numpy as np
 from solver.Solver import Solver
-from solver.Node import Node
 
 
 class LocalPlay:
 
     CELL_SIZE = 100
 
-    def __init__(self, shape=(6, 7)):
+    def __init__(self, shape=(4, 5), human_first=True):
 
         # Game environment
         self.shape = shape
@@ -21,22 +18,54 @@ class LocalPlay:
         self.main_window = pg.display.set_mode(self.WINDOW_DIMS, 0, 32)
         self.main_window.fill((255, 255, 255))
 
-        game_over = 0
-        while not game_over:
+        self.render(self.main_window)
+        pg.display.update()
 
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
+        while 1:
+
+            # Check if AI plays first
+            if not human_first:
+                self.update_AI()
+                # Check for draw
+                if self.env.gameState.isEndGame:
+                    break
+
+            # Ask user for valid command
+            event = self.choose_move()
+
+            # User wishes to quit
+            if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
 
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    game_over = self.update_player(event)
-                    if game_over:
-                        break
-                    # self.update_AI()
+            # User selects a valid command
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                try_again = self.update_player(event)
+                while try_again:
+                    event = self.choose_move()
+                    try_again = self.update_player(event)
 
-            self.render(self.main_window)
-            pg.display.update()
+
+            if self.env.gameState.isEndGame:
+                break
+
+            # Check if AI plays second
+            if human_first:
+                self.update_AI()
+
+            # Check for draw
+            if self.env.gameState.isEndGame:
+                break
+
+    @staticmethod
+    def choose_move():
+        while True:
+            event = pg.event.wait()
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                return event
 
     def render(self, main_window):
 
@@ -62,23 +91,25 @@ class LocalPlay:
         y = event.pos[1] // self.CELL_SIZE
         action = y * self.shape[1] + x
 
-        done = 0
+        try_again = True
         if action in self.env.gameState.allowedActions:
-            next_state, value, done, info = self.env.step(action)
+            _, _, _, _ = self.env.step(action)
+            try_again = False
 
-        return done
+        self.render(self.main_window)
+        pg.display.update()
+
+        return try_again
 
     def update_AI(self):
         solver = Solver(self.env.gameState)
-        scores = np.empty(self.shape[1], dtype=int)
+        action = solver.get_action()
+        self.env.step(action)
 
-        for col in range(self.shape[1]):
-            if solver.root_node.can_play(col):
-                scores[col] = solver.solve(solver.root_node.play(col))
-
-        print(scores)
-        best_col = np.argmax(scores)[-1]
+        self.render(self.main_window)
+        pg.display.update()
 
 
+if __name__ == '__main__':
+    play = LocalPlay(shape=(4, 4), human_first=False)
 
-play = LocalPlay(shape=(4, 5))
