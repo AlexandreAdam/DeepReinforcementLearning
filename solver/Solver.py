@@ -54,7 +54,7 @@ class Solver:
 
     # Returns best column to play. Only works for root node given to constructor.
     def get_col(self):
-        scores = np.array([-float('inf')] * self.root_node.WIDTH)
+        scores = np.array([-99999999] * self.root_node.WIDTH, dtype=int)
 
         for column_nb in range(self.root_node.WIDTH):
             if self.root_node.can_play(column_nb):
@@ -65,18 +65,21 @@ class Solver:
                 next_node.play(column_nb)
                 scores[column_nb] = -self.negamax(node=next_node, color=-self.player_turn)
 
-        best_col = np.argsort(scores)[-1]
+        best_scores = np.where(scores == np.amax(scores))[0]
 
-        return best_col, self.root_node.is_winning_move(best_col)
+        # If more than one column have the same score, pick one at random
+        best_col = int(np.random.choice(best_scores, 1)[0])
+
+        return best_col
 
     # Returns best action to play. Only works for root node given to constructor.
     def get_action(self):
-        best_column, done = self.get_col()
+        best_column = self.get_col()
 
         # Convert column to action
         for y in range(self.shape[0]-1, -1, -1):
             if self.board[y*self.shape[1] + best_column] == 0:
-                return y*self.shape[1] + best_column, done
+                return y*self.shape[1] + best_column
 
     def negamax(self, node, alpha=-float('inf'), beta=float('inf'), color=1, depth=float('inf')):
 
