@@ -32,7 +32,7 @@ class Solver:
     def get_binary_rep(self, board, player_turn):
 
         # Initialize
-        mask, position = np.zeros(board.size, dtype=int), np.zeros(board.size, dtype=int)
+        mask, position = np.zeros(board.size, dtype=np.int64), np.zeros(board.size, dtype=np.int64)
 
         # Fill the mask and position
         mask[np.where(board != 0)[0]] = 1
