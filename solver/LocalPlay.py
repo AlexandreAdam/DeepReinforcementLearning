@@ -45,7 +45,6 @@ class LocalPlay:
                     event = self.choose_move()
                     try_again = self.update_player(event)
 
-
             if self.env.gameState.isEndGame:
                 break
 
@@ -111,5 +110,9 @@ class LocalPlay:
 
 
 if __name__ == '__main__':
-    play = LocalPlay(shape=(4, 4), human_first=False)
+    play = LocalPlay(shape=(3, 5), human_first=True)
+
+'''WEIRD BEHAVIOR: Easy to beat when Ai goes first, always ties when human goes first'''
+
+
 
