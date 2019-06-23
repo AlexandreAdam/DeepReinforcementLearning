@@ -23,6 +23,8 @@ class LocalPlay:
 
         while 1:
 
+
+
             # Check if AI plays first
             if not human_first:
                 self.update_AI()
@@ -92,7 +94,7 @@ class LocalPlay:
 
         try_again = True
         if action in self.env.gameState.allowedActions:
-            _, _, _, _ = self.env.step(action)
+            next_state, _, _, _ = self.env.step(action)
             try_again = False
 
         self.render(self.main_window)
@@ -110,9 +112,5 @@ class LocalPlay:
 
 
 if __name__ == '__main__':
-    play = LocalPlay(shape=(3, 5), human_first=True)
-
-'''WEIRD BEHAVIOR: Easy to beat when Ai goes first, always ties when human goes first'''
-
-
+    play = LocalPlay(shape=(4, 4), human_first=True)
 
