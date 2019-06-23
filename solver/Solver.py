@@ -65,16 +65,18 @@ class Solver:
                 next_node.play(column_nb)
                 scores[column_nb] = -self.negamax(node=next_node, color=-self.player_turn)
 
-        return np.argsort(scores)[-1]
+        best_col = np.argsort(scores)[-1]
+
+        return best_col, self.root_node.is_winning_move(best_col)
 
     # Returns best action to play. Only works for root node given to constructor.
     def get_action(self):
-        best_column = self.get_col()
+        best_column, done = self.get_col()
 
         # Convert column to action
         for y in range(self.shape[0]-1, -1, -1):
             if self.board[y*self.shape[1] + best_column] == 0:
-                return y*self.shape[1] + best_column
+                return y*self.shape[1] + best_column, done
 
     def negamax(self, node, alpha=-float('inf'), beta=float('inf'), color=1, depth=float('inf')):
 
