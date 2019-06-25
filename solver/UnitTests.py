@@ -201,7 +201,8 @@ def double_menace():
 
     end_time = time()
 
-    assert (game.gameState.board[16] == 1 and game.gameState.board[15] == 1)
+    assert (game.gameState.board[15] == 1 and game.gameState.board[15] == 1 or
+            game.gameState.board[16] == 1 and game.gameState.board[17] == 1)
 
     print('\n TEST SUCCESSFUL:', total_nodes, ' nodes explored in ', round(end_time-start_time, 2), 'seconds.')
     print('|----------------------------------------------------------------------------|')
