@@ -6,6 +6,7 @@ class Solver:
 
     """
     Dynamic4 solver. Can be perfect or not depending on depth parameter.
+    Note: Partial depth not yet implemented.
     """
 
     def __init__(self, gamestate):
@@ -54,7 +55,9 @@ class Solver:
 
     # Returns best column to play. Only works for root node given to constructor.
     def get_col(self):
-        scores = np.array([self.player_turn*-99999999] * self.root_node.WIDTH, dtype=int)
+
+        # HIGHER SCORES ARE BETTER FOR PLAYER A (STATIC PERSPECTIVE)
+        scores = np.array([-self.player_turn*99] * self.root_node.WIDTH, dtype=int)
 
         for column_nb in range(self.root_node.WIDTH):
             if self.root_node.can_play(column_nb):
@@ -65,15 +68,15 @@ class Solver:
                 next_node.play(column_nb)
                 scores[column_nb] = self.negamax(node=next_node, color=-self.player_turn)
 
-        if self.player_turn == -1:
-            best_scores = np.where(scores == np.amin(scores))[0]
-        else:
+        print(self.player_turn, scores)
+
+        if self.player_turn == 1:
             best_scores = np.where(scores == np.amax(scores))[0]
+        else:
+            best_scores = np.where(scores == np.amin(scores))[0]
 
         # If more than one column have the same score, pick one at random
-        best_col = int(np.random.choice(best_scores, 1)[0])
-
-        return best_col
+        return int(np.random.choice(best_scores, 1)[0])
 
     # Returns best action to play. Only works for root node given to constructor.
     def get_action(self):
@@ -84,6 +87,8 @@ class Solver:
             if self.board[y*self.shape[1] + best_column] == 0:
                 return y*self.shape[1] + best_column
 
+    # Returns the score of a certain node. This score is always calculated from the point of view of player A,  whose
+    # color value is one. Higher heuristic values always represent situations more favorable for player A.
     def negamax(self, node, alpha=-float('inf'), beta=float('inf'), color=1, depth=float('inf')):
 
         self.nodes_explored += 1
@@ -100,7 +105,8 @@ class Solver:
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
             if node.can_play(column_nb) and node.is_winning_move(column_nb):
-                return color * ((node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2)
+                return color * ((node.WIDTH * node.HEIGHT) // 2 - (node.total_moves+2) // 2)
+                # return color * ((node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2)
 
         value = -float('inf')
 
