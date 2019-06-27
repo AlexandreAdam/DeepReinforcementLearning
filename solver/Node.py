@@ -1,11 +1,3 @@
-
-
-"""
-ATTENTION:
-    -Column indexes are defined between 1 to width and not 0 to width-1
-"""
-
-
 class Node:
 
     def __init__(self, position, mask, total_moves, shape=(6, 7)):
@@ -29,12 +21,13 @@ class Node:
     def can_play(self, column_nb):
         return (self.mask & self.top_mask(column_nb)) == 0
 
+    # A turn consists of XORing the position, updating the mask and incrementing total moves
     def play(self, column_nb):
         self.position = self.position ^ self.mask  # Invert the position
-        # self.mask = self.mask | self.bottom_mask(column_nb)  # Update the mask
         self.mask = self.mask | self.mask + self.bottom_mask(column_nb)  # Update the mask
         self.total_moves += 1  # Update the move counter
 
+    # Checks if the move leads to a leaf
     def is_winning_move(self, column_nb):
         pos = self.position
         pos = pos | ((self.mask + self.bottom_mask(column_nb)) & self.column_mask(column_nb))
@@ -48,7 +41,7 @@ class Node:
         if m & (m >> (2 * (self.HEIGHT+1))):
             return True
 
-        # Vertical;
+        # Vertical
         m = position & (position >> 1)
         if m & (m >> 2):
             return True
@@ -66,5 +59,5 @@ class Node:
         return False
 
     def key(self):
-        return self.position + self.mask # + self.bottom ????????????
+        return self.position + self.mask  # + self.bottom ?
 
