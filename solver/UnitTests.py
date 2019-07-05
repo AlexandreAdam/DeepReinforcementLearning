@@ -134,17 +134,18 @@ def positive_alignments(shape=(6, 7)):
     # Vertical alignments are possible
     if shape[0] >= 4:
         for col in range(node.WIDTH):
-            for row in range(1, node.HEIGHT - 3):
+            for row in range(1, node.HEIGHT - 2):
                 winners.append(sum(map(lambda x: 2 ** x, index[row:row + 4, col])))
 
     # Horizontal alignments are possible
     if shape[1] >= 4:
         for row in range(node.HEIGHT):
-            for col in range(node.WIDTH - 4):
+            for col in range(node.WIDTH - 3):
                 winners.append(sum(map(lambda x: 2 ** x, index[row, col:col + 4])))
 
     # Diagonal alignments are possible
     if shape[0] >= 4 and shape[1] >= 4:
+
         for col in range(node.WIDTH - 3):
             for row in range(1, node.HEIGHT - 2):
                 indexes = []
@@ -152,11 +153,11 @@ def positive_alignments(shape=(6, 7)):
                     indexes.append(index[row + c, col + c])
                 winners.append(sum(map(lambda x: 2 ** x, indexes)))
 
-        for col in range(node.WIDTH - 4, -1, -1):
-            for row in range(node.HEIGHT - 3, 0, -1):
+        for col in range(node.WIDTH-1, 2, -1):
+            for row in range(node.HEIGHT-3, 0, -1):
                 indexes = []
                 for c in range(4):
-                    indexes.append(index[row + c, col + c])
+                    indexes.append(index[row + c, col - c])
                 winners.append(sum(map(lambda x: 2 ** x, indexes)))
 
     for winner in winners:
@@ -195,6 +196,7 @@ def double_menace():
 
     for x in range(3):
         solver = Solver(game.gameState)
+        print(solver.player_turn)
         game.step(solver.get_action())
         total_nodes += solver.nodes_explored
         print('\n', game)
@@ -265,12 +267,11 @@ def first_move():
 
 
 if __name__ == '__main__':
-    test_shapes = [(2, 6), (4, 6), (6, 6), (2, 7), (4, 7), (6, 7)]
-
+    test_shapes = [(2, 6), (4, 4), (4, 6), (6, 6), (2, 7), (4, 7), (6, 7)]
     for test_shape in test_shapes:
         fill_position_mask(test_shape)
         positive_alignments(test_shape)
 
     double_menace()
     counter_double_menace()
-    first_move()
+    # first_move()
