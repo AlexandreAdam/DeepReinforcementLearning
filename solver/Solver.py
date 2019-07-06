@@ -106,8 +106,7 @@ class Solver:
             return color * ((node.WIDTH * node.HEIGHT) // 2 - (node.total_moves+1) // 2)
 
         # Base case 3 (Child of current node is leaf, victory)
-        for column_nb in range(node.WIDTH):
-            column_nb = self.exploration_order[column_nb]
+        for column_nb in self.exploration_order:
             if node.can_play(column_nb) and node.is_winning_move(column_nb):
                 return color * ((node.WIDTH * node.HEIGHT) // 2 - (node.total_moves+2) // 2)
                 # return color * ((node.WIDTH * node.HEIGHT - 1 - node.total_moves) // 2)
@@ -115,9 +114,7 @@ class Solver:
         value = -float('inf')
 
         # Recursion on each child
-        for column_nb in range(node.WIDTH):
-            column_nb = self.exploration_order[column_nb]
-
+        for column_nb in self.exploration_order:
             if node.can_play(column_nb):
                 # Create and update child Node
                 next_node = Node(position=node.position, mask=node.mask, total_moves=node.total_moves, shape=node.shape)
