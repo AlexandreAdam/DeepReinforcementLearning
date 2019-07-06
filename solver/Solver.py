@@ -101,7 +101,11 @@ class Solver:
         if node.total_moves == node.WIDTH * node.HEIGHT:
             return 0
 
-        # Base case 3 (Leaf node, victory)
+        # Base case 3 (Current node is leaf, victory)
+        if node.alignment(node.position):
+            return color * ((node.WIDTH * node.HEIGHT) // 2 - (node.total_moves+1) // 2)
+
+        # Base case 3 (Child of current node is leaf, victory)
         for column_nb in range(node.WIDTH):
             column_nb = self.exploration_order[column_nb]
             if node.can_play(column_nb) and node.is_winning_move(column_nb):
